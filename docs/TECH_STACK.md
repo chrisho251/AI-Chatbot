@@ -243,7 +243,7 @@ Checked on 2026-09-25. Prices change, so check the provider pages before you rel
 
 ### Testing on AWS (M5 and M6): this costs money
 
-- The services agreement assumes the AWS 12-month free tier. Accounts created on or after 15 July 2025 no longer get it. They get 100 to 200 USD of credits for 6 months on the Free plan. Accounts created before that date keep the legacy 12-month free tier.
+- About the AWS 12-month free tier, accounts created on or after 15 July 2025 no longer get it. They get 100 to 200 USD of credits for 6 months on the Free plan. Accounts created before that date keep the legacy 12-month free tier.
 - No GPU instance is free-tier eligible, and the 10-user target needs a GPU. Using one requires the Paid plan. Credits left over still apply after the upgrade.
 - Approximate on-demand prices in us-east-1: g4dn.xlarge (T4) about 0.53 USD per hour, g6.xlarge (L4 24 GB) about 0.80 USD per hour, g5.xlarge (A10G 24 GB) about 1.00 USD per hour. ca-central-1 is slightly more expensive.
 - Common hidden costs: a NAT Gateway (about 33 USD per month even when idle), public IPv4 addresses (about 3.60 USD per month each), a load balancer (from about 16 USD per month), CloudWatch log ingestion, and data transfer out.
