@@ -255,8 +255,3 @@ Checked on 2026-09-25. Prices change, so check the provider pages before you rel
 3. Keep data on the instance disk and in S3. Take an EBS snapshot before each milestone review.
 4. Set an AWS Budget with an email alert from day one.
 5. Rough order of magnitude: 60 hours of GPU testing costs 50 to 60 USD, plus about 16 USD per month for a 200 GB disk. Most of it fits in the new-account credits.
-
-### Actions to take early
-
-- Tell the capstone instructor that the 12-month free tier assumption no longer holds for new accounts. Agree on who owns the AWS account and the budget, since section 9 of the agreement says the program covers testing costs.
-- Request a G instance vCPU quota increase as soon as the account exists. New accounts often start at zero and approval can take days.
