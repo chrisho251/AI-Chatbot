@@ -1,6 +1,6 @@
 # AI-chatbot
 
-Backend of a Health Science exam-prep chatbot. It uses open-weight models only, RAG with eight workers, RAGAs evaluation, and escalation to external sources and human experts. It runs locally first and moves to AWS later.
+Backend of a AI chatbot. It uses open-weight models only, RAG with eight workers, RAGAs evaluation, and escalation to external sources and human experts. It runs locally first and moves to AWS later.
 
 **Read next:**
 - [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md): how the system works.
