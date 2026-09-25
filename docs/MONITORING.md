@@ -79,7 +79,7 @@ Rules:
 
 ## 7. Milestone performance summary
 
-Section 8 of the agreement asks for a written performance summary at each milestone review. From the dashboards, over the review period, report:
+From the dashboards, over the review period, report:
 
 1. Latency and response time p50 and p95, against the Appendix D thresholds.
 2. Throughput at 10 concurrent users, from the load test.
