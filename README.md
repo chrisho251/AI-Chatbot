@@ -3,7 +3,6 @@
 Backend of a Health Science exam-prep chatbot. It uses open-weight models only, RAG with eight workers, RAGAs evaluation, and escalation to external sources and human experts. It runs locally first and moves to AWS later.
 
 **Read next:**
-- [plan.md](plan.md): who builds what, in which order, and how to test it.
 - [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md): how the system works.
 - [docs/TECH_STACK.md](docs/TECH_STACK.md): every tool, service and model, what your machine needs, and what costs money (section 11).
 - [docs/MONITORING.md](docs/MONITORING.md): metrics, dashboards, and the milestone performance summary.
