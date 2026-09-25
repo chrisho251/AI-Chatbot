@@ -46,16 +46,6 @@ uv run --package chatbot-platform chatbot-platform status
 - `scripts/`: comment rule check, lane boundary check, dashboard check, CI package selection, test runner.
 - `docs/`: architecture, tech stack, diagrams.
 
-Every package has a README that says who owns it, what it reads and writes, and which file to build first. Every stub file starts with a docstring that explains what to build and how to test it.
-
-## Rules for everyone
-
-- **English everywhere**: code, comments, docs, commit messages.
-- **Comments and docstrings** are short and focused, and never use dash, semicolon, colon or arrow characters. Slash and ampersand are fine. In SQL, `--` starts a comment. `python scripts/check_comments.py` checks this, and so do pre-commit and CI.
-- **No imports across lanes.** Services and workers depend only on `libs/`. They talk over HTTP with `chatbot_contracts.routes`. `python scripts/check_boundaries.py` checks this.
-- **Tests never need another lane.** Use `chatbot_contracts.samples`, `chatbot_common.testing.fake_client` and `chatbot_platform.testing.make_test_platform`.
-- **Markdown** uses lists, not tables.
-
 ## Useful tasks
 
 - `uv run poe lint`: ruff lint.
