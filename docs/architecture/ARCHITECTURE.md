@@ -8,7 +8,6 @@
 
 **Related documents**
 - [../TECH_STACK.md](../TECH_STACK.md): every service, tool, model and database, with portability notes and compose profiles.
-- [../../plan.md](../../plan.md): the order in which the four lanes build and test the code.
 - [../MONITORING.md](../MONITORING.md): metrics, dashboards and how to maintain them.
 
 **Diagrams** (drawn with Archify; each HTML is interactive, with a PNG and its JSON source next to it in [diagrams/](diagrams/))
@@ -367,7 +366,7 @@ Each entry reads: **failure**, then what happens, how we detect it, and how we h
 
 ```
 AI-chatbot/
-  README.md, plan.md, pyproject.toml, uv.lock, compose.yaml, .env.example
+  README.md, pyproject.toml, uv.lock, compose.yaml, .env.example
   docs/
     TECH_STACK.md
     architecture/              this file and diagrams/
