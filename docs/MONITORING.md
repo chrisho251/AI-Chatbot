@@ -1,13 +1,7 @@
 # Monitoring
 
 **Version:** 1.0
-**Date:** 2026-09-25
-**Read this when:** you record a metric, open or change a dashboard, or prepare the performance summary for a milestone review.
-**Owner:** Lane D, with Lane A for the `reporting` schema and the Postgres role.
 
-The services agreement asks for a monitoring dashboard (Appendix B), escalation metrics (Appendix C.2), RAGAs results at every milestone (Appendix A.6), and dashboard access plus a written performance summary for the Institution (section 8). This page explains the frame that already exists and how to keep it working.
-
----
 
 ## 1. How it fits together
 
