@@ -1,0 +1,54 @@
+{
+  "additionalProperties": false,
+  "description": "One page found on an allowlisted external source. Always shown as unvetted.",
+  "properties": {
+    "licence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Licence"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "snapshot_uri": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Snapshot Uri"
+    },
+    "snippet": {
+      "title": "Snippet",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "url": {
+      "title": "Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "url",
+    "title",
+    "snippet",
+    "score"
+  ],
+  "title": "ExternalItem",
+  "type": "object"
+}

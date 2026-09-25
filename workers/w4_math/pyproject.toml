@@ -1,0 +1,28 @@
+[project]
+name = "chatbot-w4-math"
+version = "1.0.0"
+description = "W4 Worker math, LaTeX normalization and verified statistical computations"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-platform",
+  "scipy>=1.14",
+  "statsmodels>=0.14",
+  "sympy>=1.13",
+]
+
+[project.scripts]
+chatbot-w4-math-job = "chatbot_w4_math.job:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

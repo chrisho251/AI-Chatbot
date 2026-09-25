@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AI-chatbot: Ingestion, Source File to Published Corpus Version",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1250,
+      460
+    ]
+  },
+  "components": [
+    {
+      "id": "sme",
+      "type": "frontend",
+      "label": "SME",
+      "sublabel": "reviews sample + diff",
+      "pos": [
+        870,
+        40
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "index",
+      "type": "database",
+      "label": "Serving index",
+      "sublabel": "pgvector · vN+1",
+      "pos": [
+        1080,
+        40
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "sources",
+      "type": "frontend",
+      "label": "Upload or cron",
+      "sublabel": "admin CLI · W7 finds",
+      "pos": [
+        30,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "loader",
+      "type": "backend",
+      "label": "W1 Loader",
+      "sublabel": "sha256 · doc_version",
+      "pos": [
+        240,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "parser",
+      "type": "backend",
+      "label": "Parser",
+      "sublabel": "W1 layout · W2 W3 W4",
+      "pos": [
+        450,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "cleaner",
+      "type": "backend",
+      "label": "W5 Cleaner",
+      "sublabel": "dedupe · PII · scan",
+      "pos": [
+        660,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "embedder",
+      "type": "backend",
+      "label": "W6 Embedder",
+      "sublabel": "chunk · embed",
+      "pos": [
+        870,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Quality gate",
+      "sublabel": "auto checks",
+      "pos": [
+        1080,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "raw",
+      "type": "database",
+      "label": "Object store raw/",
+      "sublabel": "SeaweedFS · write-once",
+      "pos": [
+        30,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "lineage",
+      "type": "database",
+      "label": "Registry + lineage",
+      "sublabel": "Postgres · runs",
+      "pos": [
+        240,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "lake",
+      "type": "database",
+      "label": "Iceberg tiers",
+      "sublabel": "cleaned/ · chunked/",
+      "pos": [
+        660,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "Embedding model",
+      "sublabel": "bge-m3 · TEI",
+      "pos": [
+        870,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "rejected",
+      "type": "security",
+      "label": "Rejected",
+      "sublabel": "report to owner",
+      "pos": [
+        1080,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Ingestion job · Dagster",
+      "wraps": [
+        "loader",
+        "parser",
+        "cleaner",
+        "embedder"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "arrive",
+      "from": "sources",
+      "to": "loader",
+      "label": "new file",
+      "variant": "emphasis"
+    },
+    {
+      "id": "store",
+      "from": "loader",
+      "to": "raw",
+      "label": "put sha256"
+    },
+    {
+      "id": "register",
+      "from": "loader",
+      "to": "lineage",
+      "label": "doc_version",
+      "labelDy": 24
+    },
+    {
+      "id": "regions",
+      "from": "loader",
+      "to": "parser",
+      "label": "Region",
+      "variant": "emphasis"
+    },
+    {
+      "id": "extracted",
+      "from": "parser",
+      "to": "cleaner",
+      "label": "extracted",
+      "variant": "emphasis"
+    },
+    {
+      "id": "pages",
+      "from": "cleaner",
+      "to": "embedder",
+      "label": "CleanPage",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cleaned",
+      "from": "cleaner",
+      "to": "lake",
+      "label": "cleaned/",
+      "labelDy": 24
+    },
+    {
+      "id": "chunked",
+      "from": "embedder",
+      "to": "lake",
+      "label": "chunked/ vN+1"
+    },
+    {
+      "id": "embed",
+      "from": "embedder",
+      "to": "model",
+      "label": "embed",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "candidate",
+      "from": "embedder",
+      "to": "gate",
+      "label": "ChunkSet",
+      "variant": "emphasis"
+    },
+    {
+      "id": "signoff",
+      "from": "sme",
+      "to": "gate",
+      "label": "sign-off",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "publish",
+      "from": "gate",
+      "to": "index",
+      "label": "publish vN+1",
+      "variant": "emphasis",
+      "labelDx": 30
+    },
+    {
+      "id": "fail",
+      "from": "gate",
+      "to": "rejected",
+      "label": "fail · reject",
+      "variant": "security",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "One writer to the index",
+      "items": [
+        "Only a passed and signed-off candidate reaches pgvector",
+        "Publishing moves the serving alias, students keep vN until then"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Versioned at every step",
+      "items": [
+        "A new sha256 is a new doc_version, corrections supersede",
+        "chunk_id is content-addressed, unchanged pages are reused"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "External finds take the same path",
+      "items": [
+        "W7 web finds wait in a candidate queue for SME triage",
+        "Accepted finds enter as external_exercise with a licence"
+      ]
+    }
+  ]
+}

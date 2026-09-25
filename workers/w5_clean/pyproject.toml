@@ -1,0 +1,31 @@
+[project]
+name = "chatbot-w5-clean"
+version = "1.0.0"
+description = "W5 Worker clean, normalization, dedupe, PII scrub and injection scan"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-platform",
+  "datasketch>=1.6",
+  "ftfy>=6.3",
+  "presidio-analyzer>=2.2",
+  "presidio-anonymizer>=2.2",
+  "trafilatura>=2.0",
+  "transformers>=4.46",
+]
+
+[project.scripts]
+chatbot-w5-clean-job = "chatbot_w5_clean.job:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

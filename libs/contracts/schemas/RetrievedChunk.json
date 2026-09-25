@@ -1,0 +1,71 @@
+{
+  "additionalProperties": false,
+  "description": "A chunk with the score of each retrieval stage that saw it.",
+  "properties": {
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "dense": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dense"
+    },
+    "doc_version": {
+      "title": "Doc Version",
+      "type": "string"
+    },
+    "lexical": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lexical"
+    },
+    "page_end": {
+      "title": "Page End",
+      "type": "integer"
+    },
+    "page_start": {
+      "title": "Page Start",
+      "type": "integer"
+    },
+    "rerank": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rerank"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "chunk_id",
+    "doc_version",
+    "page_start",
+    "page_end",
+    "text"
+  ],
+  "title": "RetrievedChunk",
+  "type": "object"
+}

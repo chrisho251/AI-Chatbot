@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "RegionKind": {
+      "enum": [
+        "text",
+        "figure",
+        "scan",
+        "table",
+        "equation",
+        "code"
+      ],
+      "title": "RegionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One retrievable piece of text. The embedding is left out when read back from search.",
+  "properties": {
+    "chunk_id": {
+      "title": "Chunk Id",
+      "type": "string"
+    },
+    "doc_version": {
+      "title": "Doc Version",
+      "type": "string"
+    },
+    "embedding": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Embedding"
+    },
+    "kinds": {
+      "items": {
+        "$ref": "#/$defs/RegionKind"
+      },
+      "title": "Kinds",
+      "type": "array"
+    },
+    "page_end": {
+      "minimum": 1,
+      "title": "Page End",
+      "type": "integer"
+    },
+    "page_start": {
+      "minimum": 1,
+      "title": "Page Start",
+      "type": "integer"
+    },
+    "region_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Region Ids",
+      "type": "array"
+    },
+    "section_path": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Section Path",
+      "type": "array"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "token_count": {
+      "minimum": 0,
+      "title": "Token Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "chunk_id",
+    "doc_version",
+    "page_start",
+    "page_end",
+    "text",
+    "token_count"
+  ],
+  "title": "Chunk",
+  "type": "object"
+}

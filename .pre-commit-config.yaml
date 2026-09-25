@@ -1,0 +1,31 @@
+# Install the git hooks once with the pre commit install command. The same checks run in CI
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: comment-rule
+        name: comment rule
+        entry: python scripts/check_comments.py
+        language: system
+        types_or: [python, sql, yaml, toml, dockerfile]
+      - id: lane-boundaries
+        name: lane boundaries
+        entry: python scripts/check_boundaries.py
+        language: system
+        pass_filenames: false
+        files: pyproject\.toml$
+      - id: dashboards
+        name: dashboards match metrics and views
+        entry: python scripts/check_dashboards.py
+        language: system
+        pass_filenames: false
+        files: (infra/local/grafana/|chatbot_common/metrics\.py|migrations/versions/)

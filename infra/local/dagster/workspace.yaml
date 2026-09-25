@@ -1,0 +1,4 @@
+load_from:
+  - python_module:
+      module_name: chatbot_pipelines.definitions
+      attribute: defs

@@ -1,0 +1,89 @@
+# Checks every push and pull request with as few CI minutes as possible
+# Only packages touched by the change are tested, see scripts/changed_packages.py
+# A newer push to the same branch cancels the run still in progress
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.select.outputs.packages }}
+      postgres: ${{ steps.select.outputs.postgres }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: select
+        run: python scripts/changed_packages.py "${{ github.event.pull_request.base.sha || github.event.before }}"
+
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv lock --check
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: python scripts/check_comments.py
+      - run: python scripts/check_boundaries.py
+      - run: python scripts/check_dashboards.py
+      - run: uv run pytest tests/tooling
+
+  tests:
+    needs: plan
+    if: needs.plan.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.plan.outputs.packages) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: python scripts/run_tests.py ${{ matrix.package }}
+
+  platform-on-postgres:
+    needs: plan
+    if: needs.plan.outputs.postgres == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: chatbot
+          POSTGRES_PASSWORD: chatbot
+          POSTGRES_DB: chatbot_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U chatbot"
+          --health-interval 5s
+          --health-retries 20
+    env:
+      PLATFORM_TEST_DATABASE_URL: postgresql+psycopg://chatbot:chatbot@localhost:5432/chatbot_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: python scripts/run_tests.py chatbot-platform -- -m integration
+      - name: dashboard SQL runs on the migrated database
+        run: |
+          uv run --package chatbot-platform python -c "from chatbot_platform import migrate; migrate.upgrade('$PLATFORM_TEST_DATABASE_URL', 1024)"
+          uv run --package chatbot-platform python scripts/check_dashboards.py "$PLATFORM_TEST_DATABASE_URL"

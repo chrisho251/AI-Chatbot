@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "CorpusStatus": {
+      "enum": [
+        "candidate",
+        "published",
+        "rejected"
+      ],
+      "title": "CorpusStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable corpus version. The serving and candidate aliases point at one of these.",
+  "properties": {
+    "chunker_version": {
+      "title": "Chunker Version",
+      "type": "string"
+    },
+    "doc_versions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Doc Versions",
+      "type": "array"
+    },
+    "embedding_model": {
+      "title": "Embedding Model",
+      "type": "string"
+    },
+    "gate_report_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Gate Report Id"
+    },
+    "parent_version": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Parent Version"
+    },
+    "producer": {
+      "default": "unknown",
+      "title": "Producer",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/CorpusStatus"
+    },
+    "version_id": {
+      "minimum": 1,
+      "title": "Version Id",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "version_id",
+    "doc_versions",
+    "embedding_model",
+    "chunker_version",
+    "status"
+  ],
+  "title": "CorpusManifest",
+  "type": "object"
+}

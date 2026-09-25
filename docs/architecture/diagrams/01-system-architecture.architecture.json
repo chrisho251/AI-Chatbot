@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AI-chatbot: System Architecture",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1240,
+      800
+    ]
+  },
+  "components": [
+    {
+      "id": "student",
+      "type": "frontend",
+      "label": "Student",
+      "sublabel": "existing web frontend",
+      "pos": [
+        510,
+        40
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "expert",
+      "type": "frontend",
+      "label": "On-duty expert",
+      "sublabel": "expert answer API",
+      "pos": [
+        1040,
+        40
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "identity",
+      "type": "security",
+      "label": "Keycloak + Vault",
+      "sublabel": "[infra/local]",
+      "pos": [
+        270,
+        170
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "OIDC · keys"
+    },
+    {
+      "id": "gateway",
+      "type": "security",
+      "label": "API gateway",
+      "sublabel": "[services/gateway]",
+      "pos": [
+        510,
+        170
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "guard · pseudonym"
+    },
+    {
+      "id": "orchestrator",
+      "type": "backend",
+      "label": "Query orchestrator",
+      "sublabel": "[services/orchestrator]",
+      "pos": [
+        510,
+        300
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "confidence"
+    },
+    {
+      "id": "escalation",
+      "type": "backend",
+      "label": "Escalation",
+      "sublabel": "[services/escalation]",
+      "pos": [
+        1040,
+        300
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "expert path"
+    },
+    {
+      "id": "inputs",
+      "type": "backend",
+      "label": "W2 · W5 · W6",
+      "sublabel": "[workers/w2 w5 w6]",
+      "pos": [
+        30,
+        430
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "vision · clean · embed"
+    },
+    {
+      "id": "w7",
+      "type": "backend",
+      "label": "W7 Deepsearch",
+      "sublabel": "[workers/w7_deepsearch]",
+      "pos": [
+        270,
+        430
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "internal first"
+    },
+    {
+      "id": "w8",
+      "type": "backend",
+      "label": "W8 Gen",
+      "sublabel": "[workers/w8_gen]",
+      "pos": [
+        750,
+        430
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "cited answer"
+    },
+    {
+      "id": "tools",
+      "type": "backend",
+      "label": "W3 Code · W4 Math",
+      "sublabel": "[workers/w3 w4]",
+      "pos": [
+        1040,
+        430
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "sandbox"
+    },
+    {
+      "id": "web",
+      "type": "external",
+      "label": "Open web sources",
+      "sublabel": "SearXNG · PubMed · OpenStax",
+      "pos": [
+        30,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "platform",
+      "type": "database",
+      "label": "Data platform",
+      "sublabel": "[libs/platform]",
+      "pos": [
+        510,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "versioned vN"
+    },
+    {
+      "id": "models",
+      "type": "backend",
+      "label": "Model serving",
+      "sublabel": "llama.cpp · vLLM · TEI",
+      "pos": [
+        750,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "observability",
+      "type": "backend",
+      "label": "Observability",
+      "sublabel": "OTel · Prometheus · Grafana",
+      "pos": [
+        1040,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "sme",
+      "type": "frontend",
+      "label": "SME · content owner",
+      "sublabel": "admin CLI · sign-off",
+      "pos": [
+        30,
+        690
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "Corpus pipeline",
+      "sublabel": "[workers/w1 … w6]",
+      "pos": [
+        270,
+        690
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "Dagster"
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Quality gate",
+      "sublabel": "[libs/platform/gate]",
+      "pos": [
+        510,
+        690
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "checks + SME"
+    },
+    {
+      "id": "evalft",
+      "type": "backend",
+      "label": "Eval + fine-tuning",
+      "sublabel": "[ml/eval · ml/finetune]",
+      "pos": [
+        750,
+        690
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "RAGAs · LoRA"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Edge · identity",
+      "wraps": [
+        "identity",
+        "gateway"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Online query plane · FastAPI",
+      "wraps": [
+        "orchestrator",
+        "escalation",
+        "inputs",
+        "w7",
+        "w8",
+        "tools"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Shared services",
+      "wraps": [
+        "platform",
+        "models",
+        "observability"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Offline plane · Dagster",
+      "wraps": [
+        "pipeline",
+        "gate",
+        "evalft"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "ask",
+      "from": "student",
+      "to": "gateway",
+      "label": "HTTPS · SSE · uploads",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "oidc",
+      "from": "identity",
+      "to": "gateway",
+      "label": "OIDC · keys",
+      "variant": "security"
+    },
+    {
+      "id": "forward",
+      "from": "gateway",
+      "to": "orchestrator",
+      "label": "pseudonymized ask",
+      "variant": "emphasis",
+      "labelDy": 24
+    },
+    {
+      "id": "prepare",
+      "from": "orchestrator",
+      "to": "inputs",
+      "label": "image · text · query"
+    },
+    {
+      "id": "retrieve",
+      "from": "orchestrator",
+      "to": "w7",
+      "label": "retrieve @vN",
+      "variant": "emphasis"
+    },
+    {
+      "id": "generate",
+      "from": "orchestrator",
+      "to": "w8",
+      "label": "grounded prompt",
+      "variant": "emphasis"
+    },
+    {
+      "id": "toolcall",
+      "from": "w8",
+      "to": "tools",
+      "label": "CalcCheck · CodeTask",
+      "variant": "dashed"
+    },
+    {
+      "id": "l3",
+      "from": "orchestrator",
+      "to": "escalation",
+      "label": "still L3",
+      "variant": "security"
+    },
+    {
+      "id": "notify",
+      "from": "escalation",
+      "to": "expert",
+      "label": "notify · answer",
+      "variant": "dashed",
+      "labelDy": -120
+    },
+    {
+      "id": "late",
+      "from": "escalation",
+      "to": "gateway",
+      "label": "expert answer · async",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "right"
+    },
+    {
+      "id": "websearch",
+      "from": "w7",
+      "to": "web",
+      "label": "fallback search",
+      "variant": "dashed"
+    },
+    {
+      "id": "hybrid",
+      "from": "w7",
+      "to": "platform",
+      "label": "hybrid search"
+    },
+    {
+      "id": "infer",
+      "from": "w8",
+      "to": "models",
+      "label": "LLM stream",
+      "labelDy": 24
+    },
+    {
+      "id": "otlp",
+      "from": "tools",
+      "to": "observability",
+      "label": "OTLP · all services",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "upload",
+      "from": "sme",
+      "to": "pipeline",
+      "label": "upload PDFs"
+    },
+    {
+      "id": "chunks",
+      "from": "pipeline",
+      "to": "gate",
+      "label": "ChunkSet"
+    },
+    {
+      "id": "publish",
+      "from": "gate",
+      "to": "platform",
+      "label": "publish vN+1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "promote",
+      "from": "evalft",
+      "to": "models",
+      "label": "promote adapter"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Internal first, web second",
+      "items": [
+        "W7 searches the pinned corpus version, then the allowlisted web",
+        "Web finds are labelled unvetted and queued for SME review"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "One image, two entrypoints",
+      "items": [
+        "W1 to W6 run offline as Dagster steps",
+        "W2 to W8 also serve answer-time APIs, W3 code runs in a sandbox"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Local now, AWS later",
+      "items": [
+        "SeaweedFS → S3 · Postgres → RDS · Keycloak → Cognito",
+        "Vault → KMS · Docker Compose → Terraform"
+      ]
+    }
+  ]
+}

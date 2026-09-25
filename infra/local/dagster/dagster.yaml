@@ -1,0 +1,9 @@
+# Dagster instance, runs and schedules are stored in the dagster database
+storage:
+  postgres:
+    postgres_db:
+      hostname: postgres
+      username: chatbot
+      password: chatbot
+      db_name: dagster
+      port: 5432

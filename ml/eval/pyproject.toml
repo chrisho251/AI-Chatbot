@@ -1,0 +1,24 @@
+[project]
+name = "chatbot-eval"
+version = "1.0.0"
+description = "RAGAs evaluation, golden set, quality gate checks and Appendix C test runs"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-platform",
+  "datasets>=3.0",
+  "ragas>=0.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

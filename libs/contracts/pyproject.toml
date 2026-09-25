@@ -1,0 +1,13 @@
+[project]
+name = "chatbot-contracts"
+version = "1.0.0"
+description = "Typed records exchanged between every worker and service"
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic>=2.9"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

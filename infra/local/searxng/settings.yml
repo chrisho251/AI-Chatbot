@@ -1,0 +1,7 @@
+# Local SearXNG for W7 external search. The json format is what W7 reads
+use_default_settings: true
+server:
+  secret_key: local-development-only
+  limiter: false
+search:
+  formats: [html, json]

@@ -1,0 +1,54 @@
+[project]
+name = "ai-chatbot"
+version = "1.0.0"
+description = "Workspace root for the Health Science exam prep chatbot backend"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "mypy>=1.13",
+  "poethepoet>=0.31",
+  "pre-commit>=4.0",
+  "pytest>=8.3",
+  "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["libs/*", "services/*", "workers/*", "pipelines", "ml/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["libs/*/src", "services/*/src", "workers/*/src", "pipelines/src", "ml/*/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/versions/*.py" = ["E501"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib -m 'not integration'"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = ["integration: needs the data compose profile running"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+
+[tool.poe.tasks]
+lint = "ruff check ."
+format = "ruff format ."
+check-comments = "python scripts/check_comments.py"
+check-boundaries = "python scripts/check_boundaries.py"
+check-dashboards = "python scripts/check_dashboards.py"
+test = "python scripts/run_tests.py"
+up-data = "docker compose --profile data up -d"
+down = "docker compose --profile '*' down"
+init-platform = "uv run --package chatbot-platform chatbot-platform init"
+export-schemas = "uv run --package chatbot-contracts python -m chatbot_contracts.schema_export libs/contracts/schemas"

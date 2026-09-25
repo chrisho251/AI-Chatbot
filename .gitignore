@@ -1,0 +1,32 @@
+# Editor files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets and local configuration
+.env
+*.pem
+infra/local/traefik/certs/
+
+# Local data, model weights and logs
+data/*
+!data/.gitkeep
+models/
+*.gguf
+*.safetensors
+*.log

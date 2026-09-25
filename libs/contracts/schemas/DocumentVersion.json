@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "SourceType": {
+      "enum": [
+        "textbook",
+        "lecture_note",
+        "past_exam",
+        "answer_key",
+        "external_exercise"
+      ],
+      "title": "SourceType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One exact file of a source document, registered when it is uploaded.\n\nW1 fills page_count after layout analysis. supersedes names the version it corrects.",
+  "properties": {
+    "course_code": {
+      "title": "Course Code",
+      "type": "string"
+    },
+    "doc_id": {
+      "title": "Doc Id",
+      "type": "string"
+    },
+    "doc_version": {
+      "title": "Doc Version",
+      "type": "string"
+    },
+    "licence": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Licence"
+    },
+    "page_count": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Page Count"
+    },
+    "producer": {
+      "default": "unknown",
+      "title": "Producer",
+      "type": "string"
+    },
+    "raw_uri": {
+      "title": "Raw Uri",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "sha256": {
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Sha256",
+      "type": "string"
+    },
+    "source_id": {
+      "title": "Source Id",
+      "type": "string"
+    },
+    "source_type": {
+      "$ref": "#/$defs/SourceType"
+    },
+    "source_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Url"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    }
+  },
+  "required": [
+    "doc_id",
+    "doc_version",
+    "sha256",
+    "source_type",
+    "course_code",
+    "source_id",
+    "raw_uri"
+  ],
+  "title": "DocumentVersion",
+  "type": "object"
+}

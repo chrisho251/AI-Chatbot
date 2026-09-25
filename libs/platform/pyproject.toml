@@ -1,0 +1,29 @@
+[project]
+name = "chatbot-platform"
+version = "1.0.0"
+description = "Data platform: object store, registry, serving index, versioning, quality gate, lineage, retention"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "alembic>=1.14",
+  "boto3>=1.35",
+  "pgvector>=0.3.6",
+  "psycopg[binary]>=3.2",
+  "pyarrow>=18",
+  "pydantic-settings>=2.6",
+  "pyiceberg[pyarrow,sql-postgres,sql-sqlite]>=0.9",
+  "sqlalchemy>=2.0.36",
+]
+
+[project.scripts]
+chatbot-platform = "chatbot_platform.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24", "moto[s3]>=5.0"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

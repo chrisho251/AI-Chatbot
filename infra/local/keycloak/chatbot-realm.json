@@ -1,0 +1,24 @@
+{
+  "realm": "chatbot",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      { "name": "student" },
+      { "name": "sme" },
+      { "name": "expert" },
+      { "name": "data_engineer" },
+      { "name": "ml_engineer" },
+      { "name": "ops" },
+      { "name": "auditor" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "chatbot",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost/*"],
+      "webOrigins": ["+"]
+    }
+  ]
+}

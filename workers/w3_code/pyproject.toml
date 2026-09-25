@@ -1,0 +1,31 @@
+[project]
+name = "chatbot-w3-code"
+version = "1.0.0"
+description = "W3 Worker code, generate run and check R Python and Excel solutions"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-platform",
+  "formulas>=1.2",
+  "numpy>=2.0",
+  "openpyxl>=3.1",
+  "pandas>=2.2",
+  "scipy>=1.14",
+  "statsmodels>=0.14",
+]
+
+[project.scripts]
+chatbot-w3-code-job = "chatbot_w3_code.job:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

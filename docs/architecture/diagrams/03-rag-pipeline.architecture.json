@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AI-chatbot: RAG Pipeline, Question to Cited Answer",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1250,
+      720
+    ]
+  },
+  "components": [
+    {
+      "id": "index",
+      "type": "database",
+      "label": "Serving index",
+      "sublabel": "pgvector · pinned vN",
+      "pos": [
+        660,
+        40
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "models",
+      "type": "backend",
+      "label": "LLM serving",
+      "sublabel": "Qwen3 4B · adapters",
+      "pos": [
+        870,
+        40
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "tools",
+      "type": "backend",
+      "label": "W3 Code · W4 Math",
+      "sublabel": "sandbox · SymPy",
+      "pos": [
+        1080,
+        40
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "student",
+      "type": "frontend",
+      "label": "Student",
+      "sublabel": "question · photo",
+      "pos": [
+        30,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "guard",
+      "type": "security",
+      "label": "Gateway guard",
+      "sublabel": "auth · injection · misuse",
+      "pos": [
+        240,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "prep",
+      "type": "backend",
+      "label": "Input prep",
+      "sublabel": "W2 · W5 · W6",
+      "pos": [
+        450,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "retrieve",
+      "type": "backend",
+      "label": "W7 Retrieve",
+      "sublabel": "hybrid + rerank",
+      "pos": [
+        660,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "generate",
+      "type": "backend",
+      "label": "W8 Generate",
+      "sublabel": "cited · streamed",
+      "pos": [
+        870,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "confidence",
+      "type": "security",
+      "label": "Confidence",
+      "sublabel": "rerank · NLI · cites",
+      "pos": [
+        1080,
+        180
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "blocked",
+      "type": "security",
+      "label": "Blocked",
+      "sublabel": "refused · logged",
+      "pos": [
+        240,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "escalation",
+      "type": "backend",
+      "label": "L3 escalation",
+      "sublabel": "ticket · status event",
+      "pos": [
+        1080,
+        330
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "web",
+      "type": "external",
+      "label": "Open web sources",
+      "sublabel": "W7 external · allowlist",
+      "pos": [
+        870,
+        470
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "expert",
+      "type": "frontend",
+      "label": "On-duty expert",
+      "sublabel": "notified · answers later",
+      "pos": [
+        1080,
+        610
+      ],
+      "size": [
+        140,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Backend API · gateway + query orchestrator",
+      "wraps": [
+        "guard",
+        "prep",
+        "retrieve",
+        "generate",
+        "confidence"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "ask",
+      "from": "student",
+      "to": "guard",
+      "label": "question",
+      "variant": "emphasis"
+    },
+    {
+      "id": "reply",
+      "from": "guard",
+      "to": "student",
+      "label": "answer",
+      "variant": "emphasis",
+      "labelDy": 20
+    },
+    {
+      "id": "safe",
+      "from": "guard",
+      "to": "prep",
+      "label": "safe",
+      "variant": "emphasis"
+    },
+    {
+      "id": "unsafe",
+      "from": "guard",
+      "to": "blocked",
+      "label": "unsafe",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "vector",
+      "from": "prep",
+      "to": "retrieve",
+      "label": "vector",
+      "variant": "emphasis"
+    },
+    {
+      "id": "topk",
+      "from": "index",
+      "to": "retrieve",
+      "label": "top-k @vN",
+      "labelDy": 24
+    },
+    {
+      "id": "context",
+      "from": "retrieve",
+      "to": "generate",
+      "label": "top-8",
+      "variant": "emphasis"
+    },
+    {
+      "id": "llm",
+      "from": "generate",
+      "to": "models",
+      "label": "LLM",
+      "labelDx": -22
+    },
+    {
+      "id": "toolcall",
+      "from": "generate",
+      "to": "tools",
+      "label": "CalcCheck · CodeTask",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "draft",
+      "from": "generate",
+      "to": "confidence",
+      "label": "draft",
+      "variant": "emphasis"
+    },
+    {
+      "id": "l3",
+      "from": "confidence",
+      "to": "escalation",
+      "label": "L3",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "first",
+      "from": "escalation",
+      "to": "web",
+      "label": "1st",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "external",
+      "from": "web",
+      "to": "generate",
+      "label": "external context",
+      "variant": "dashed"
+    },
+    {
+      "id": "second",
+      "from": "escalation",
+      "to": "expert",
+      "label": "2nd",
+      "variant": "security",
+      "labelDy": 150
+    },
+    {
+      "id": "async",
+      "from": "expert",
+      "to": "student",
+      "label": "expert answer · async",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Confidence decides",
+      "items": [
+        "Score = rerank strength + NLI groundedness + citation coverage",
+        "L1 answers, L2 adds a caveat, L3 escalates"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Level 3 order",
+      "items": [
+        "1st: W7 searches allowlisted web sources, W8 regenerates",
+        "2nd: the on-duty expert answers later, the student is told"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Two clocks per request",
+      "items": [
+        "Latency = t_first − t0, response time = t_last − t0",
+        "Every answer logs vN, chunk ids, model and prompt version"
+      ]
+    }
+  ]
+}

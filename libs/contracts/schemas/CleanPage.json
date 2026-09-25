@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "PageFlags": {
+      "additionalProperties": false,
+      "description": "Quality signals W5 records for one page. The quality gate reads them.",
+      "properties": {
+        "dup_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dup Of"
+        },
+        "injection_hits": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Injection Hits",
+          "type": "integer"
+        },
+        "min_ocr_conf": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Ocr Conf"
+        },
+        "pii_hits": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Pii Hits",
+          "type": "integer"
+        },
+        "pii_remaining": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Pii Remaining",
+          "type": "integer"
+        }
+      },
+      "title": "PageFlags",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One cleaned page in markdown. W5 writes exactly one per page, blank pages included.",
+  "properties": {
+    "doc_version": {
+      "title": "Doc Version",
+      "type": "string"
+    },
+    "flags": {
+      "$ref": "#/$defs/PageFlags"
+    },
+    "ingestion_run_id": {
+      "title": "Ingestion Run Id",
+      "type": "string"
+    },
+    "markdown": {
+      "title": "Markdown",
+      "type": "string"
+    },
+    "page_no": {
+      "minimum": 1,
+      "title": "Page No",
+      "type": "integer"
+    },
+    "producer": {
+      "default": "unknown",
+      "title": "Producer",
+      "type": "string"
+    },
+    "region_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Region Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ingestion_run_id",
+    "doc_version",
+    "page_no",
+    "markdown"
+  ],
+  "title": "CleanPage",
+  "type": "object"
+}

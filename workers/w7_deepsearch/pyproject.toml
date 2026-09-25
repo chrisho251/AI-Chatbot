@@ -1,0 +1,26 @@
+[project]
+name = "chatbot-w7-deepsearch"
+version = "1.0.0"
+description = "W7 Worker deepsearch, internal hybrid retrieval first and allowlisted web search second"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-platform",
+  "trafilatura>=2.0",
+]
+
+[project.scripts]
+chatbot-w7-enrichment-job = "chatbot_w7_deepsearch.job:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

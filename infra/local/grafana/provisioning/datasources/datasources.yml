@@ -1,0 +1,27 @@
+# Data sources for the dashboards. The uids are fixed because dashboard JSON refers to them
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    url: http://prometheus:9090
+    isDefault: true
+  - name: Loki
+    type: loki
+    uid: loki
+    url: http://loki:3100
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    url: http://tempo:3200
+  - name: Platform
+    type: grafana-postgresql-datasource
+    uid: platform
+    url: postgres:5432
+    user: grafana_reader
+    jsonData:
+      database: chatbot
+      sslmode: disable
+      postgresVersion: 1600
+    secureJsonData:
+      password: grafana-reader

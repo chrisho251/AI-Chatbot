@@ -1,0 +1,9 @@
+# Loads every dashboard JSON from infra/local/grafana/dashboards into the AI chatbot folder
+apiVersion: 1
+providers:
+  - name: ai-chatbot
+    folder: AI-chatbot
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

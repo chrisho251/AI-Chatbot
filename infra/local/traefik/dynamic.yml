@@ -1,0 +1,12 @@
+# Routes public traffic to the gateway. Add mkcert certificates under tls for trusted local https
+http:
+  routers:
+    gateway:
+      rule: PathPrefix(`/`)
+      entryPoints: [web, websecure]
+      service: gateway
+  services:
+    gateway:
+      loadBalancer:
+        servers:
+          - url: http://gateway:8000

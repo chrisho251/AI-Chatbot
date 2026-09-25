@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AI-chatbot: RAG Worker Map",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1250,
+      800
+    ]
+  },
+  "components": [
+    {
+      "id": "w2o",
+      "type": "backend",
+      "label": "W2 Vision",
+      "sublabel": "figures → OCR · alt",
+      "pos": [
+        240,
+        30
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w1",
+      "type": "backend",
+      "label": "W1 Ingest",
+      "sublabel": "Docling layout",
+      "pos": [
+        30,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w5o",
+      "type": "backend",
+      "label": "W5 Clean",
+      "sublabel": "dedupe · PII · scan",
+      "pos": [
+        450,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w6o",
+      "type": "backend",
+      "label": "W6 Embed",
+      "sublabel": "chunk · bge-m3",
+      "pos": [
+        660,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Quality gate",
+      "sublabel": "checks + SME",
+      "pos": [
+        870,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w3o",
+      "type": "backend",
+      "label": "W3 Code",
+      "sublabel": "code → verbatim",
+      "pos": [
+        240,
+        170
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "sources",
+      "type": "frontend",
+      "label": "Sources",
+      "sublabel": "PDFs · approved web finds",
+      "pos": [
+        30,
+        260
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w4o",
+      "type": "backend",
+      "label": "W4 Math",
+      "sublabel": "equations → LaTeX",
+      "pos": [
+        240,
+        260
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "student",
+      "type": "frontend",
+      "label": "Student",
+      "sublabel": "question · photo",
+      "pos": [
+        30,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w2n",
+      "type": "backend",
+      "label": "W2 Vision",
+      "sublabel": "photo → text",
+      "pos": [
+        240,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w5n",
+      "type": "backend",
+      "label": "W5 Clean",
+      "sublabel": "normalize · scan",
+      "pos": [
+        450,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w6n",
+      "type": "backend",
+      "label": "W6 Embed",
+      "sublabel": "query vector",
+      "pos": [
+        660,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w7",
+      "type": "backend",
+      "label": "W7 Deepsearch",
+      "sublabel": "internal → web",
+      "pos": [
+        870,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "index",
+      "type": "database",
+      "label": "Serving index",
+      "sublabel": "pgvector · vN",
+      "pos": [
+        1080,
+        430
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w3n",
+      "type": "backend",
+      "label": "W3 Code",
+      "sublabel": "R · Python · Excel",
+      "pos": [
+        450,
+        560
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w8",
+      "type": "backend",
+      "label": "W8 Gen",
+      "sublabel": "answer + cite",
+      "pos": [
+        660,
+        560
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "web",
+      "type": "external",
+      "label": "Open web",
+      "sublabel": "allowlisted sources",
+      "pos": [
+        1080,
+        560
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "w4n",
+      "type": "backend",
+      "label": "W4 Math",
+      "sublabel": "SymPy · SciPy",
+      "pos": [
+        450,
+        690
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "models",
+      "type": "backend",
+      "label": "LLM serving",
+      "sublabel": "llama.cpp · vLLM",
+      "pos": [
+        1080,
+        690
+      ],
+      "size": [
+        140,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Offline · build the knowledge base · Dagster",
+      "wraps": [
+        "w1",
+        "w2o",
+        "w3o",
+        "w4o",
+        "w5o",
+        "w6o",
+        "gate",
+        "sources"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Online · answer a question · FastAPI",
+      "wraps": [
+        "w2n",
+        "w5n",
+        "w6n",
+        "w7",
+        "w8",
+        "w3n",
+        "w4n"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "put",
+      "from": "sources",
+      "to": "w1",
+      "label": "upload"
+    },
+    {
+      "id": "fig",
+      "from": "w1",
+      "to": "w2o"
+    },
+    {
+      "id": "code",
+      "from": "w1",
+      "to": "w3o"
+    },
+    {
+      "id": "eq",
+      "from": "w1",
+      "to": "w4o"
+    },
+    {
+      "id": "txt",
+      "from": "w1",
+      "to": "w5o",
+      "label": "text"
+    },
+    {
+      "id": "ocr",
+      "from": "w2o",
+      "to": "w5o"
+    },
+    {
+      "id": "verb",
+      "from": "w3o",
+      "to": "w5o"
+    },
+    {
+      "id": "latex",
+      "from": "w4o",
+      "to": "w5o"
+    },
+    {
+      "id": "page",
+      "from": "w5o",
+      "to": "w6o",
+      "label": "CleanPage"
+    },
+    {
+      "id": "chunks",
+      "from": "w6o",
+      "to": "gate",
+      "label": "ChunkSet"
+    },
+    {
+      "id": "manifest",
+      "from": "gate",
+      "to": "index",
+      "label": "CorpusManifest",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "ask",
+      "from": "student",
+      "to": "w2n",
+      "label": "ask",
+      "variant": "emphasis"
+    },
+    {
+      "id": "photo",
+      "from": "w2n",
+      "to": "w5n",
+      "label": "text",
+      "variant": "emphasis"
+    },
+    {
+      "id": "clean",
+      "from": "w5n",
+      "to": "w6n",
+      "label": "clean",
+      "variant": "emphasis"
+    },
+    {
+      "id": "vector",
+      "from": "w6n",
+      "to": "w7",
+      "label": "vector",
+      "variant": "emphasis"
+    },
+    {
+      "id": "topk",
+      "from": "index",
+      "to": "w7",
+      "label": "top-k @vN",
+      "labelDx": -10
+    },
+    {
+      "id": "result",
+      "from": "w7",
+      "to": "w8",
+      "label": "top-8",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fallback",
+      "from": "w7",
+      "to": "web",
+      "label": "fallback",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "codetask",
+      "from": "w8",
+      "to": "w3n",
+      "label": "CodeTask",
+      "variant": "dashed"
+    },
+    {
+      "id": "calc",
+      "from": "w8",
+      "to": "w4n",
+      "label": "CalcCheck",
+      "variant": "dashed"
+    },
+    {
+      "id": "llm",
+      "from": "w8",
+      "to": "models",
+      "label": "LLM stream",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "One image, two entrypoints",
+      "items": [
+        "W2 to W6 run offline as Dagster steps and online as APIs",
+        "Both roles share one image and the contracts package"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One way into the index",
+      "items": [
+        "Only the quality gate publishes a CorpusManifest",
+        "W7 searches the pinned version first, the web second"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Tools at answer time",
+      "items": [
+        "W8 sends CalcCheck to W4 and CodeTask to W3",
+        "W3 runs R, Python and Excel in a no-network sandbox"
+      ]
+    }
+  ]
+}

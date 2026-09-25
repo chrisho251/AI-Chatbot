@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "chatbot",
+      "credentials": [{ "accessKey": "chatbot", "secretKey": "chatbot-secret" }],
+      "actions": ["Admin", "Read", "List", "Tagging", "Write"]
+    }
+  ]
+}

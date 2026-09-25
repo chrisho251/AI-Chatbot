@@ -1,0 +1,24 @@
+[project]
+name = "chatbot-pipelines"
+version = "1.0.0"
+description = "Dagster definitions for the offline plane"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-platform",
+  "dagster>=1.9",
+  "dagster-docker>=0.25",
+  "dagster-postgres>=0.25",
+  "dagster-webserver>=1.9",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-platform = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

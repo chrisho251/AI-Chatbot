@@ -1,0 +1,347 @@
+# Local stack. Start only the profiles a task needs, see docs/TECH_STACK.md section 3
+# Service hostnames here are the defaults of chatbot_common.settings.service_url
+name: ai-chatbot
+
+x-python-service: &python-service
+  restart: unless-stopped
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    PLATFORM_DATABASE_URL: postgresql+psycopg://chatbot:chatbot@postgres:5432/chatbot
+    PLATFORM_S3_ENDPOINT_URL: http://seaweedfs:8333
+    CHATBOT_LLM_BASE_URL: http://llm:8080/v1
+    CHATBOT_EMBED_BASE_URL: http://tei-embed:80
+    CHATBOT_RERANK_BASE_URL: http://tei-rerank:80
+    CHATBOT_SANDBOX_URL: http://w3-sandbox:8000
+  depends_on:
+    postgres:
+      condition: service_healthy
+      required: false
+
+x-build: &build
+  context: .
+  dockerfile: infra/docker/python.Dockerfile
+
+services:
+  # Profile data, the data platform
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    profiles: [data]
+    environment:
+      POSTGRES_USER: chatbot
+      POSTGRES_PASSWORD: chatbot
+      POSTGRES_DB: chatbot
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/local/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "chatbot"]
+      interval: 5s
+      retries: 20
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:3.80
+    profiles: [data]
+    command: server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    ports: ["8333:8333"]
+    volumes:
+      - seaweed:/data
+      - ./infra/local/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  # Profile core, the answer path
+
+  traefik:
+    image: traefik:v3.3
+    profiles: [core]
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./infra/local/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.0
+    profiles: [core]
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports: ["8180:8080"]
+    volumes:
+      - ./infra/local/keycloak:/opt/keycloak/data/import:ro
+
+  vault:
+    image: hashicorp/vault:1.18.3
+    profiles: [core]
+    command: server -dev -dev-listen-address=0.0.0.0:8200
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: dev-root-token
+    cap_add: [IPC_LOCK]
+    ports: ["8200:8200"]
+
+  gateway:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-gateway } }
+    image: ai-chatbot/gateway
+    profiles: [core]
+    command: ["uvicorn", "chatbot_gateway.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports: ["8000:8000"]
+
+  orchestrator:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-orchestrator } }
+    image: ai-chatbot/orchestrator
+    profiles: [core]
+    command: ["uvicorn", "chatbot_orchestrator.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  escalation:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-escalation } }
+    image: ai-chatbot/escalation
+    profiles: [core]
+    command: ["uvicorn", "chatbot_escalation.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w2-vision:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w2-vision } }
+    image: ai-chatbot/w2-vision
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w2_vision.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w3-code:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w3-code } }
+    image: ai-chatbot/w3-code
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w3_code.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+    networks: [default, sandbox]
+
+  w4-math:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w4-math } }
+    image: ai-chatbot/w4-math
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w4_math.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w5-clean:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w5-clean } }
+    image: ai-chatbot/w5-clean
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w5_clean.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w6-embed:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w6-embed } }
+    image: ai-chatbot/w6-embed
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w6_embed.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w7-deepsearch:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w7-deepsearch } }
+    image: ai-chatbot/w7-deepsearch
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w7_deepsearch.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  w8-gen:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-w8-gen } }
+    image: ai-chatbot/w8-gen
+    profiles: [core]
+    command: ["uvicorn", "chatbot_w8_gen.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+
+  # Profile images, offline only images that Dagster starts, never run directly
+
+  w1-ingest:
+    build: { <<: *build, args: { PACKAGE: chatbot-w1-ingest } }
+    image: ai-chatbot/w1-ingest
+    profiles: [images]
+
+  # Profile cpu, models on any machine. Pin exact model revisions in .env
+
+  llm:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    profiles: [cpu]
+    command: ["-hf", "${LLM_GGUF_REPO:-Qwen/Qwen3-4B-GGUF}", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "8192", "--metrics"]
+    ports: ["8080:8080"]
+    volumes:
+      - models:/root/.cache
+
+  tei-embed:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    profiles: [cpu]
+    command: ["--model-id", "${EMBED_MODEL:-BAAI/bge-m3}"]
+    ports: ["8081:80"]
+    volumes:
+      - models:/data
+
+  tei-rerank:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
+    profiles: [cpu]
+    command: ["--model-id", "${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}"]
+    ports: ["8082:80"]
+    volumes:
+      - models:/data
+
+  # Profile gpu, the 10 user target on an NVIDIA machine. Use it instead of cpu
+
+  llm-gpu:
+    image: vllm/vllm-openai:v0.9.2
+    profiles: [gpu]
+    command: ["--model", "${LLM_MODEL_REPO:-Qwen/Qwen3-4B}", "--port", "8080", "--enable-lora"]
+    ports: ["8080:8080"]
+    volumes:
+      - models:/root/.cache/huggingface
+    networks:
+      default:
+        aliases: [llm]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  dcgm-exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.9-3.6.1-ubuntu22.04
+    profiles: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Profile search, W7 external search
+
+  searxng:
+    image: searxng/searxng:latest
+    profiles: [search]
+    ports: ["8888:8080"]
+    volumes:
+      - ./infra/local/searxng/settings.yml:/etc/searxng/settings.yml:ro
+
+  # Profile sandbox, W3 code execution with no network access
+
+  w3-sandbox:
+    build: workers/w3_code/sandbox
+    image: ai-chatbot/w3-sandbox
+    profiles: [sandbox]
+    networks: [sandbox]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+
+  # Profile pipeline, the offline plane
+
+  dagster-webserver:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-pipelines } }
+    image: ai-chatbot/pipelines
+    profiles: [pipeline]
+    command: ["dagster-webserver", "-h", "0.0.0.0", "-p", "3000", "-w", "/app/infra/local/dagster/workspace.yaml"]
+    environment:
+      DAGSTER_HOME: /app/infra/local/dagster
+      PLATFORM_DATABASE_URL: postgresql+psycopg://chatbot:chatbot@postgres:5432/chatbot
+      PLATFORM_S3_ENDPOINT_URL: http://seaweedfs:8333
+    ports: ["3000:3000"]
+
+  dagster-daemon:
+    <<: *python-service
+    build: { <<: *build, args: { PACKAGE: chatbot-pipelines } }
+    image: ai-chatbot/pipelines
+    profiles: [pipeline]
+    command: ["dagster-daemon", "run", "-w", "/app/infra/local/dagster/workspace.yaml"]
+    environment:
+      DAGSTER_HOME: /app/infra/local/dagster
+      PLATFORM_DATABASE_URL: postgresql+psycopg://chatbot:chatbot@postgres:5432/chatbot
+      PLATFORM_S3_ENDPOINT_URL: http://seaweedfs:8333
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.1.0
+    profiles: [pipeline]
+    command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts"]
+    ports: ["5000:5000"]
+    volumes:
+      - mlflow:/mlflow
+
+  # Profile obs, monitoring for Appendix B
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    profiles: [obs]
+    command: ["--config=/etc/otel/collector.yaml"]
+    ports: ["4317:4317", "4318:4318"]
+    volumes:
+      - ./infra/local/otel/collector.yaml:/etc/otel/collector.yaml:ro
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    profiles: [obs]
+    ports: ["9090:9090"]
+    volumes:
+      - ./infra/local/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  loki:
+    image: grafana/loki:3.3.2
+    profiles: [obs]
+    ports: ["3100:3100"]
+
+  tempo:
+    image: grafana/tempo:2.7.0
+    profiles: [obs]
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./infra/local/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+
+  grafana:
+    image: grafana/grafana:11.5.0
+    profiles: [obs]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    ports: ["3001:3000"]
+    volumes:
+      - ./infra/local/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/local/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    profiles: [obs]
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+  # Profile dev, local email capture
+
+  mailpit:
+    image: axllent/mailpit:v1.22.0
+    profiles: [dev]
+    ports: ["8025:8025", "1025:1025"]
+
+networks:
+  default: {}
+  sandbox:
+    internal: true
+
+volumes:
+  pgdata:
+  seaweed:
+  models:
+  mlflow:
