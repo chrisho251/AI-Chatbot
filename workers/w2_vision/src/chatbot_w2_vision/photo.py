@@ -2,7 +2,8 @@
 
 Purpose
 Appendix A.4 asks W2 to process photographed problem sets. This is the answer time path, so it
-must stay fast. Measure it on CPU because it counts toward latency.
+must stay fast. Measure it on CPU because it counts toward latency. It runs inside the api
+process, so await the vision model and keep image decoding in a worker thread.
 
 Input
 A VisionRequest whose attachment points to the uploads bucket.

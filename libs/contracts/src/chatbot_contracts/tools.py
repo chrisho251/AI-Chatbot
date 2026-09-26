@@ -9,7 +9,7 @@ from chatbot_contracts.enums import CodeLanguage, Verdict
 class CalcCheck(OnlineRecord):
     """Ask W4 to compute or verify a value.
 
-    operation names an entry of the W4 catalogue, for example t_test or dosage.
+    operation names an entry of the W4 catalogue, for example t_test_one_sample.
     """
 
     operation: str

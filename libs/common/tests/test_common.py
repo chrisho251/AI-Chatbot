@@ -4,9 +4,9 @@ import httpx
 from fastapi.testclient import TestClient
 
 from chatbot_common.embeddings import TeiEmbedder, TeiReranker
-from chatbot_common.http import ContractClient
+from chatbot_common.http import ContractClient, register_local, shared_client
 from chatbot_common.llm import ChatClient
-from chatbot_common.service import create_app, decode_events, sse_response
+from chatbot_common.service import add_contract_routes, create_app, decode_events, sse_response
 from chatbot_common.settings import service_url
 from chatbot_common.testing import fake_client
 from chatbot_contracts import routes, samples
@@ -56,6 +56,52 @@ async def test_contract_client_reads_a_stream():
     client = ContractClient(fake_client({routes.ANSWER: lambda request: events}))
     received = [event async for event in client.stream(routes.ANSWER, samples.sample_ask_request())]
     assert received == events
+
+
+async def test_local_handlers_are_called_without_http():
+    async def calc(request):
+        return samples.sample_calc_result(value=request.variables.get("x", 0.0))
+
+    async def answer(request):
+        yield samples.sample_stream_event(text=request.question)
+
+    client = ContractClient(local={routes.CALC: calc, routes.ANSWER: answer})
+    result = await client.call(routes.CALC, samples.sample_calc_check(variables={"x": 2.0}))
+    received = [event async for event in client.stream(routes.ANSWER, samples.sample_ask_request())]
+    assert result.value == 2.0
+    assert [event.text for event in received] == [samples.sample_ask_request().question]
+
+
+async def test_shared_client_sees_handlers_registered_later():
+    async def vision(request):
+        return samples.sample_vision_result()
+
+    client = shared_client()
+    register_local({routes.VISION: vision})
+    assert await client.call(routes.VISION, samples.sample_vision_request()) == (
+        samples.sample_vision_result()
+    )
+
+
+def test_contract_routes_serve_the_same_handlers_over_http():
+    async def calc(request):
+        return samples.sample_calc_result(value=9.0)
+
+    def answer(request):
+        async def events():
+            yield samples.sample_stream_event()
+
+        return events()
+
+    app = create_app("w4_math")
+    add_contract_routes(app, {routes.CALC: calc, routes.ANSWER: answer})
+    client = TestClient(app)
+    calc_body = samples.sample_calc_check().model_dump(mode="json")
+    assert client.post(routes.CALC.path, json=calc_body).json()["value"] == 9.0
+    ask_body = samples.sample_ask_request().model_dump(mode="json")
+    streamed = decode_events(client.post(routes.ANSWER.path, json=ask_body).text)
+    assert streamed == [samples.sample_stream_event()]
+    assert client.post(routes.CALC.path, json={"operation": 1}).status_code == 422
 
 
 def test_service_url_uses_override_or_compose_name(monkeypatch):
@@ -116,3 +162,4 @@ def test_metrics_record_route_templates_but_not_health():
     assert 'service="w7_deepsearch"' in body
     assert 'route="/health"' not in body
     assert "chatbot_requests_total" in body
+    assert "chatbot_worker_call_seconds" in body

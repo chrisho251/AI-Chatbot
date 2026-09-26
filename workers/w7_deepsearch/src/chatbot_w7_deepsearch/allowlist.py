@@ -8,10 +8,6 @@ from urllib.parse import urlparse
 ALLOWED_DOMAINS: dict[str, str] = {
     "openstax.org": "CC BY 4.0",
     "libretexts.org": "CC BY NC SA",
-    "medlineplus.gov": "public domain",
-    "ncbi.nlm.nih.gov": "per article",
-    "europepmc.org": "per article",
-    "cdc.gov": "public domain",
 }
 
 

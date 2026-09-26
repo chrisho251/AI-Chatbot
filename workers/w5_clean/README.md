@@ -1,12 +1,12 @@
 # W5 clean
 
-Worker-clean from Appendix A.4. Two roles in one image:
+Worker-clean from Appendix A.4. Two roles in one package:
 
 - **Offline (ingest):** joins regions into pages, normalizes, removes boilerplate, dedupes, scrubs PII, scans for injected instructions, writes the `cleaned` tier.
 - **Online (answer time):** cleans the question, uploaded text and fetched web pages.
 
 **Owner:** Lane B.
-**Offline reads:** `corpus.regions` (text) and `corpus.extracted_regions`. **Writes:** `corpus.cleaned_pages`, exactly one `CleanPage` per page.
+**Offline reads:** `ingest.regions` (text) and `ingest.extracted_regions`. **Writes:** `ingest.cleaned_pages`, exactly one `CleanPage` per page.
 **Online endpoint:** `POST /v1/clean`, `CleanRequest` to `CleanResult`.
 
 ## Files
@@ -22,7 +22,7 @@ Presidio needs a spaCy English model that is not on PyPI:
 uv run --package chatbot-w5-clean python -m spacy download en_core_web_lg
 ```
 
-The Dockerfile must do the same at build time.
+The app image must do the same at build time.
 
 ## Start here
 

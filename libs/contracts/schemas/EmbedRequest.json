@@ -1,8 +1,8 @@
 {
   "additionalProperties": false,
   "properties": {
-    "corpus_version": {
-      "title": "Corpus Version",
+    "kb_version": {
+      "title": "Kb Version",
       "type": "integer"
     },
     "producer": {
@@ -15,7 +15,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0",
+      "default": "1.1",
       "title": "Schema Version",
       "type": "string"
     },
@@ -30,7 +30,7 @@
   "required": [
     "request_id",
     "texts",
-    "corpus_version"
+    "kb_version"
   ],
   "title": "EmbedRequest",
   "type": "object"

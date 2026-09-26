@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-w7-deepsearch"
-version = "1.0.0"
+version = "1.1.0"
 description = "W7 Worker deepsearch, internal hybrid retrieval first and allowlisted web search second"
 requires-python = ">=3.12,<3.13"
 dependencies = [

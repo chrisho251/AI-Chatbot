@@ -2,7 +2,7 @@
   "$defs": {
     "Citation": {
       "additionalProperties": false,
-      "description": "Points at a corpus chunk, or at an external url for unvetted sources.",
+      "description": "Points at a knowledge base chunk, or at an external url for unvetted sources.",
       "properties": {
         "chunk_id": {
           "anyOf": [
@@ -79,7 +79,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "One server sent event from the gateway to the student frontend.",
+  "description": "One server sent event from the gateway to the student frontend.\n\nThe gateway sets conversation_id so the frontend can send it back with the next question.",
   "properties": {
     "citations": {
       "items": {
@@ -87,6 +87,18 @@
       },
       "title": "Citations",
       "type": "array"
+    },
+    "conversation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Conversation Id"
     },
     "level": {
       "anyOf": [
@@ -109,7 +121,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0",
+      "default": "1.1",
       "title": "Schema Version",
       "type": "string"
     },

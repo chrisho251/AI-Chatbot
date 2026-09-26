@@ -1,7 +1,7 @@
 {
   "uid": "chatbot-quality",
   "title": "Quality and escalation (Appendix A.6 and C.2)",
-  "description": "RAGAs scores, escalation rate, external and expert response times, and corpus status.",
+  "description": "RAGAs scores, escalation rate, external and expert response times, and knowledge base status.",
   "tags": [
     "ai-chatbot"
   ],
@@ -24,7 +24,7 @@
       "id": 1,
       "type": "table",
       "title": "RAGAs, latest golden set run",
-      "description": "Mean score per metric of the latest golden set run, with its corpus version.",
+      "description": "Mean score per metric of the latest golden set run, with its knowledge base version.",
       "gridPos": {
         "x": 0,
         "y": 0,
@@ -51,7 +51,7 @@
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
-          "rawSql": "SELECT DISTINCT ON (metric) metric, mean_score, corpus_version, model_version, ts\nFROM reporting.ragas_summary\nWHERE dataset = 'golden'\nORDER BY metric, ts DESC"
+          "rawSql": "SELECT DISTINCT ON (metric) metric, mean_score, kb_version, model_version, ts\nFROM reporting.ragas_summary\nWHERE dataset = 'golden'\nORDER BY metric, ts DESC"
         }
       ]
     },
@@ -264,7 +264,7 @@
     {
       "id": 8,
       "type": "table",
-      "title": "Corpus status",
+      "title": "Knowledge base status",
       "description": "Serving and candidate versions, pending documents and gate reports waiting for an SME.",
       "gridPos": {
         "x": 12,
@@ -292,7 +292,7 @@
           "editorMode": "code",
           "rawQuery": true,
           "format": "table",
-          "rawSql": "SELECT * FROM reporting.corpus_status"
+          "rawSql": "SELECT * FROM reporting.kb_status"
         }
       ]
     }

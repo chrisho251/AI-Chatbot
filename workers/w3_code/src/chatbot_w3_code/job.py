@@ -1,9 +1,9 @@
 """Offline entrypoint of W3 code. The pipeline lane runs it once per ingestion run.
 
-Read the code regions of the run from corpus.regions, keep each listing verbatim in
+Read the code regions of the run from ingest.regions, keep each listing verbatim in
 a fenced block tagged with its language, and append one ExtractedRegion per listing.
 Listings are never split, W6 keeps them whole.
-Dagster starts it in the w3 code image with the run id and the document version.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

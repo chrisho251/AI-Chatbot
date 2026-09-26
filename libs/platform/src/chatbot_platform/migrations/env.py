@@ -1,7 +1,8 @@
 """Alembic environment. Migrations run online against PLATFORM_DATABASE_URL.
 
-Autogenerate only compares the registry, ops and reporting schemas. Views, and every change to the
-serving schema, are written by hand, the serving tables depend on the embedding dimension.
+Autogenerate compares every schema in sql.metadata, which is all of them except serving. Views,
+and every change to the serving schema, are written by hand, the serving tables depend on the
+embedding dimension.
 """
 
 from alembic import context
@@ -13,7 +14,7 @@ from chatbot_platform.settings import PlatformSettings
 
 
 def _include_name(name, type_, _parent_names) -> bool:
-    return type_ != "schema" or name in (sql.REGISTRY, sql.OPS, sql.REPORTING)
+    return type_ != "schema" or name in set(sql.SCHEMAS) - {sql.SERVING}
 
 
 def _run(connection) -> None:

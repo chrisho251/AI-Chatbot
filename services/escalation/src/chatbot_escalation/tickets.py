@@ -5,10 +5,11 @@ Appendix C.2. Log the full question, retrieved context and confidence for expert
 on duty expert in real time, and track escalation rate and expert response time.
 
 What to build
-open_ticket stores the ticket in ops.escalation_tickets with the question encrypted, picks the
-expert with rota.on_duty and sends notifier.notify. When nobody is on duty, fall back to the course
-coordinator. answer stores the expert answer and answered_at, the gateway then serves it to the
-student. The expert can also propose the item for the golden set or a corpus correction.
+open_ticket stores the ticket in ops.escalation_tickets with the question encrypted by the
+KeyService from chatbot_common.keys, picks the expert with rota.on_duty and sends notifier.notify.
+When nobody is on duty, fall back to the course coordinator. answer stores the expert answer and
+answered_at, get_by_request reads it back, and the gateway serves it to the student. The expert
+can also propose the item for the golden set or a knowledge base correction.
 Record EXPERT_RESPONSE from chatbot_common.metrics when an answer arrives.
 
 How to test

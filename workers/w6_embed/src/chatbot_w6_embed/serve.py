@@ -1,13 +1,15 @@
-"""HTTP entrypoint of W6 embed. The route comes from chatbot_contracts.routes."""
+"""Entrypoint of W6 embed. Routes come from chatbot_contracts.routes.
 
-from chatbot_common.service import create_app
-from chatbot_contracts.query import EmbedRequest, EmbedResult
-from chatbot_contracts.routes import EMBED
+HANDLERS is what the api service calls in process. app serves the same handlers over HTTP, for
+tests and for running W6 embed in its own container.
+"""
+
+from chatbot_common.http import LocalHandler
+from chatbot_common.service import add_contract_routes, create_app
+from chatbot_contracts.routes import EMBED, Endpoint
 from chatbot_w6_embed.query import embed_query
 
+HANDLERS: dict[Endpoint, LocalHandler] = {EMBED: embed_query}
+
 app = create_app("w6_embed")
-
-
-@app.post(EMBED.path, response_model=EmbedResult)
-async def embed(request: EmbedRequest) -> EmbedResult:
-    return await embed_query(request)
+add_contract_routes(app, HANDLERS)

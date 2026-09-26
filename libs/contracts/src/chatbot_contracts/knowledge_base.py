@@ -1,9 +1,9 @@
-"""Records of the offline plane, from a registered file to a published corpus version."""
+"""Records of the offline plane, from a registered file to a published knowledge base version."""
 
 from pydantic import Field, model_validator
 
 from chatbot_contracts.base import Model, OfflineRecord, Record
-from chatbot_contracts.enums import CorpusStatus, RegionKind, SourceType
+from chatbot_contracts.enums import KnowledgeBaseStatus, RegionKind, SourceType
 
 
 class DocumentVersion(Record):
@@ -113,13 +113,13 @@ class ChunkSet(OfflineRecord):
     chunks: list[Chunk]
 
 
-class CorpusManifest(Record):
-    """An immutable corpus version. The serving and candidate aliases point at one of these."""
+class KnowledgeBaseManifest(Record):
+    """An immutable knowledge base version. The serving and candidate aliases point at one."""
 
     version_id: int = Field(ge=1)
     parent_version: int | None = None
     doc_versions: list[str]
     embedding_model: str
     chunker_version: str
-    status: CorpusStatus
+    status: KnowledgeBaseStatus
     gate_report_id: str | None = None

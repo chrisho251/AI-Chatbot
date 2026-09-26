@@ -1,0 +1,42 @@
+[project]
+name = "chatbot-api"
+version = "1.1.0"
+description = "The api service, gateway, orchestrator, escalation and every worker in one image and one online process"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "chatbot-contracts",
+  "chatbot-common",
+  "chatbot-gateway",
+  "chatbot-orchestrator",
+  "chatbot-escalation",
+  "chatbot-w1-ingest",
+  "chatbot-w2-vision",
+  "chatbot-w3-code",
+  "chatbot-w4-math",
+  "chatbot-w5-clean",
+  "chatbot-w6-embed",
+  "chatbot-w7-deepsearch",
+  "chatbot-w8-gen",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24"]
+
+[tool.uv.sources]
+chatbot-contracts = { workspace = true }
+chatbot-common = { workspace = true }
+chatbot-gateway = { workspace = true }
+chatbot-orchestrator = { workspace = true }
+chatbot-escalation = { workspace = true }
+chatbot-w1-ingest = { workspace = true }
+chatbot-w2-vision = { workspace = true }
+chatbot-w3-code = { workspace = true }
+chatbot-w4-math = { workspace = true }
+chatbot-w5-clean = { workspace = true }
+chatbot-w6-embed = { workspace = true }
+chatbot-w7-deepsearch = { workspace = true }
+chatbot-w8-gen = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8,<0.12"]
+build-backend = "uv_build"

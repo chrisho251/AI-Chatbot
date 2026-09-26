@@ -5158,7 +5158,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <!-- Boundaries (behind everything) -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Offline · build the knowledge base · Dagster" x="0" y="0" width="1040" height="344" rx="12" class="c-region" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Online · answer a question · FastAPI" x="210" y="400" width="830" height="374" rx="12" class="c-region" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Online · answer a question · api process" x="210" y="400" width="830" height="374" rx="12" class="c-region" stroke-width="1"/>
 
         <!-- Connection paths (before components for correct z-order) -->
         <path data-edge-from="sources" data-edge-to="w1" data-edge-label="upload" data-edge-key="0" data-edge-id="put" data-composition-points="100,260;100,164" d="M 100 260 L 100 164" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
@@ -5171,7 +5171,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <path data-edge-from="w4o" data-edge-to="w5o" data-edge-key="7" data-edge-id="latex" data-composition-points="380,292;415,292;415,148;450,148" d="M 380 292 L 407 292 Q 415 292 415 284 L 415 156 Q 415 148 423 148 L 450 148" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="w5o" data-edge-to="w6o" data-edge-label="CleanPage" data-edge-key="8" data-edge-id="page" data-composition-points="590,132;660,132" d="M 590 132 L 660 132" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="w6o" data-edge-to="gate" data-edge-label="ChunkSet" data-edge-key="9" data-edge-id="chunks" data-composition-points="800,132;870,132" d="M 800 132 L 870 132" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="gate" data-edge-to="index" data-edge-label="CorpusManifest" data-edge-key="10" data-edge-id="manifest" data-composition-points="1010,132;1150,132;1150,430" d="M 1010 132 L 1142 132 Q 1150 132 1150 140 L 1150 430" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="gate" data-edge-to="index" data-edge-label="KnowledgeBaseManifest" data-edge-key="10" data-edge-id="manifest" data-composition-points="1010,132;1150,132;1150,430" d="M 1010 132 L 1142 132 Q 1150 132 1150 140 L 1150 430" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="student" data-edge-to="w2n" data-edge-label="ask" data-edge-key="11" data-edge-id="ask" data-composition-points="170,462;240,462" d="M 170 462 L 240 462" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="w2n" data-edge-to="w5n" data-edge-label="text" data-edge-key="12" data-edge-id="photo" data-composition-points="380,462;450,462" d="M 380 462 L 450 462" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <path data-edge-from="w5n" data-edge-to="w6n" data-edge-label="clean" data-edge-key="13" data-edge-id="clean" data-composition-points="590,462;660,462" d="M 590 462 L 660 462" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
@@ -5290,8 +5290,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="100" y="476" class="t-muted" font-size="9" text-anchor="middle">question · photo</text>
         </g>
 
-        <g id="node-w2n" data-node-id="w2n" data-node-label="W2 Vision" tabindex="0" role="button" aria-label="Focus W2 Vision, photo → text, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="photo → text" data-node-context="Online · answer a question · FastAPI">
-          <title>W2 Vision · photo → text · Online · answer a question · FastAPI</title>
+        <g id="node-w2n" data-node-id="w2n" data-node-label="W2 Vision" tabindex="0" role="button" aria-label="Focus W2 Vision, photo → text, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="photo → text" data-node-context="Online · answer a question · api process">
+          <title>W2 Vision · photo → text · Online · answer a question · api process</title>
           <rect x="240" y="430" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="240" y="430" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(246 436) scale(0.6875)">
@@ -5301,8 +5301,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="310" y="476" class="t-muted" font-size="9" text-anchor="middle">photo → text</text>
         </g>
 
-        <g id="node-w5n" data-node-id="w5n" data-node-label="W5 Clean" tabindex="0" role="button" aria-label="Focus W5 Clean, normalize · scan, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="normalize · scan" data-node-context="Online · answer a question · FastAPI">
-          <title>W5 Clean · normalize · scan · Online · answer a question · FastAPI</title>
+        <g id="node-w5n" data-node-id="w5n" data-node-label="W5 Clean" tabindex="0" role="button" aria-label="Focus W5 Clean, normalize · scan, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="normalize · scan" data-node-context="Online · answer a question · api process">
+          <title>W5 Clean · normalize · scan · Online · answer a question · api process</title>
           <rect x="450" y="430" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="450" y="430" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(456 436) scale(0.6875)">
@@ -5312,8 +5312,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="520" y="476" class="t-muted" font-size="9" text-anchor="middle">normalize · scan</text>
         </g>
 
-        <g id="node-w6n" data-node-id="w6n" data-node-label="W6 Embed" tabindex="0" role="button" aria-label="Focus W6 Embed, query vector, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="query vector" data-node-context="Online · answer a question · FastAPI">
-          <title>W6 Embed · query vector · Online · answer a question · FastAPI</title>
+        <g id="node-w6n" data-node-id="w6n" data-node-label="W6 Embed" tabindex="0" role="button" aria-label="Focus W6 Embed, query vector, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="query vector" data-node-context="Online · answer a question · api process">
+          <title>W6 Embed · query vector · Online · answer a question · api process</title>
           <rect x="660" y="430" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="660" y="430" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(666 436) scale(0.6875)">
@@ -5323,8 +5323,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="730" y="476" class="t-muted" font-size="9" text-anchor="middle">query vector</text>
         </g>
 
-        <g id="node-w7" data-node-id="w7" data-node-label="W7 Deepsearch" tabindex="0" role="button" aria-label="Focus W7 Deepsearch, internal → web, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="internal → web" data-node-context="Online · answer a question · FastAPI">
-          <title>W7 Deepsearch · internal → web · Online · answer a question · FastAPI</title>
+        <g id="node-w7" data-node-id="w7" data-node-label="W7 Deepsearch" tabindex="0" role="button" aria-label="Focus W7 Deepsearch, internal → web, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="internal → web" data-node-context="Online · answer a question · api process">
+          <title>W7 Deepsearch · internal → web · Online · answer a question · api process</title>
           <rect x="870" y="430" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="870" y="430" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(876 436) scale(0.6875)">
@@ -5346,8 +5346,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="1150" y="476" class="t-muted" font-size="9" text-anchor="middle">pgvector · vN</text>
         </g>
 
-        <g id="node-w3n" data-node-id="w3n" data-node-label="W3 Code" tabindex="0" role="button" aria-label="Focus W3 Code, R · Python · Excel, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="R · Python · Excel" data-node-context="Online · answer a question · FastAPI">
-          <title>W3 Code · R · Python · Excel · Online · answer a question · FastAPI</title>
+        <g id="node-w3n" data-node-id="w3n" data-node-label="W3 Code" tabindex="0" role="button" aria-label="Focus W3 Code, R · Python · Excel, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="R · Python · Excel" data-node-context="Online · answer a question · api process">
+          <title>W3 Code · R · Python · Excel · Online · answer a question · api process</title>
           <rect x="450" y="560" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="450" y="560" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(456 566) scale(0.6875)">
@@ -5357,8 +5357,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="520" y="606" class="t-muted" font-size="9" text-anchor="middle">R · Python · Excel</text>
         </g>
 
-        <g id="node-w8" data-node-id="w8" data-node-label="W8 Gen" tabindex="0" role="button" aria-label="Focus W8 Gen, answer + cite, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="answer + cite" data-node-context="Online · answer a question · FastAPI">
-          <title>W8 Gen · answer + cite · Online · answer a question · FastAPI</title>
+        <g id="node-w8" data-node-id="w8" data-node-label="W8 Gen" tabindex="0" role="button" aria-label="Focus W8 Gen, answer + cite, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="answer + cite" data-node-context="Online · answer a question · api process">
+          <title>W8 Gen · answer + cite · Online · answer a question · api process</title>
           <rect x="660" y="560" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="660" y="560" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(666 566) scale(0.6875)">
@@ -5380,8 +5380,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="1150" y="606" class="t-muted" font-size="9" text-anchor="middle">allowlisted sources</text>
         </g>
 
-        <g id="node-w4n" data-node-id="w4n" data-node-label="W4 Math" tabindex="0" role="button" aria-label="Focus W4 Math, SymPy · SciPy, Online · answer a question · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="SymPy · SciPy" data-node-context="Online · answer a question · FastAPI">
-          <title>W4 Math · SymPy · SciPy · Online · answer a question · FastAPI</title>
+        <g id="node-w4n" data-node-id="w4n" data-node-label="W4 Math" tabindex="0" role="button" aria-label="Focus W4 Math, SymPy · SciPy, Online · answer a question · api process" aria-pressed="false" data-node-kind="backend" data-node-sublabel="SymPy · SciPy" data-node-context="Online · answer a question · api process">
+          <title>W4 Math · SymPy · SciPy · Online · answer a question · api process</title>
           <rect x="450" y="690" width="140" height="64" rx="6" class="c-mask"/>
           <rect x="450" y="690" width="140" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(456 696) scale(0.6875)">
@@ -5425,9 +5425,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <rect x="810.8" y="112" width="48.4" height="14" rx="3" class="c-mask"/>
           <text x="835" y="122" class="t-muted" font-size="8" text-anchor="middle">ChunkSet</text>
         </g>
-        <g data-detail="context" data-edge-from="gate" data-edge-to="index" data-edge-label="CorpusManifest" data-edge-key="10" data-edge-id="manifest">
+        <g data-detail="context" data-edge-from="gate" data-edge-to="index" data-edge-label="KnowledgeBaseManifest" data-edge-key="10" data-edge-id="manifest">
           <rect x="1111.4" y="261" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="1150" y="271" class="t-backend" font-size="8" text-anchor="middle">CorpusManifest</text>
+          <text x="1150" y="271" class="t-backend" font-size="8" text-anchor="middle">KnowledgeBaseManifest</text>
         </g>
         <g data-detail="context" data-edge-from="student" data-edge-to="w2n" data-edge-label="ask" data-edge-key="11" data-edge-id="ask">
           <rect x="190" y="442" width="30" height="14" rx="3" class="c-mask"/>
@@ -5476,9 +5476,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text data-boundary-label="" x="8" y="23" class="t-cloud" font-size="9" font-weight="600">Offline · build the knowledge base · Dagster</text>
         </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Online · answer a question · FastAPI">
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Online · answer a question · api process">
           <rect data-graph-role="structural-frame-label-mask" x="214" y="410" width="204.4" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="218" y="423" class="t-cloud" font-size="9" font-weight="600">Online · answer a question · FastAPI</text>
+          <text data-boundary-label="" x="218" y="423" class="t-cloud" font-size="9" font-weight="600">Online · answer a question · api process</text>
         </g>
 
         <!-- Legend -->
@@ -5672,11 +5672,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <div class="card">
         <div class="card-header">
           <div class="card-dot violet"></div>
-          <h3>One image, two entrypoints</h3>
+          <h3>One package, two entrypoints</h3>
         </div>
         <ul>
-          <li>&bull; W2 to W6 run offline as Dagster steps and online as APIs</li>
-          <li>&bull; Both roles share one image and the contracts package</li>
+          <li>&bull; W2 to W6 run offline as Dagster steps and online in the api</li>
+          <li>&bull; Both roles share one package and the same contracts</li>
         </ul>
       </div>
 
@@ -5686,7 +5686,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>One way into the index</h3>
         </div>
         <ul>
-          <li>&bull; Only the quality gate publishes a CorpusManifest</li>
+          <li>&bull; Only the quality gate publishes a KnowledgeBaseManifest</li>
           <li>&bull; W7 searches the pinned version first, the web second</li>
         </ul>
       </div>

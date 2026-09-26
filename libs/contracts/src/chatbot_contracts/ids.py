@@ -31,7 +31,7 @@ def make_chunk_id(
     chunker_version: str,
     embedding_model: str,
 ) -> str:
-    """Content addressed chunk id. Unchanged pages keep the same id across corpus versions."""
+    """Content addressed chunk id. Unchanged pages keep their id across knowledge base versions."""
     parts = [doc_version, str(page_start), str(page_end), text, chunker_version, embedding_model]
     return sha256_hex(_SEPARATOR.join(parts).encode("utf-8"))
 

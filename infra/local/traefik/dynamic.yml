@@ -1,12 +1,13 @@
-# Routes public traffic to the gateway. Add mkcert certificates under tls for trusted local https
+# Routes the public routes to the api service and nothing else. Internal routes stay private
+# Add mkcert certificates under tls for trusted local https
 http:
   routers:
-    gateway:
-      rule: PathPrefix(`/`)
+    public:
+      rule: PathPrefix(`/v1/ask`) || PathPrefix(`/v1/answers/`) || PathRegexp(`^/v1/tickets/[^/]+/answer$`)
       entryPoints: [web, websecure]
-      service: gateway
+      service: api
   services:
-    gateway:
+    api:
       loadBalancer:
         servers:
-          - url: http://gateway:8000
+          - url: http://api:8000

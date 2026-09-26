@@ -1,13 +1,13 @@
 {
   "uid": "chatbot-resources",
   "title": "Resources (Appendix B.3)",
-  "description": "CPU, memory and GPU per worker and model server, plus which targets are up.",
+  "description": "CPU, memory and GPU per container and model server, plus which targets are up. Online workers share the api container, their time per call is on the Performance dashboard.",
   "tags": [
     "ai-chatbot"
   ],
   "editable": true,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
   "time": {
     "from": "now-6h",

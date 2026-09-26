@@ -3,7 +3,7 @@
 RAGAs evaluation (Appendix A.6), the golden set, the retrieval and RAGAs checks of the quality gate, and the internal testing levels of Appendix C.
 
 **Owner:** Lane D.
-**Writes:** `eval.ragas_scores`, `eval.test_cases`, `eval.test_runs`.
+**Writes:** the Postgres tables `eval.ragas_scores`, `eval.test_cases`, `eval.test_runs` (defined in `chatbot_platform.sql`), and `reporting.ragas_summary` for the dashboard.
 **Plugs into:** `chatbot_platform.gate` (see `gate_checks.py`) and the Dagster schedules of Lane A.
 
 ## Files
@@ -17,7 +17,7 @@ RAGAs evaluation (Appendix A.6), the golden set, the retrieval and RAGAs checks 
 
 1. A first golden set of about 30 items per course, reviewed by an SME.
 2. `ragas_runner.run` against a faked orchestrator, then against the real one.
-3. `gate_checks`, so a bad corpus can no longer publish.
+3. `gate_checks`, so a bad knowledge base version can no longer publish.
 
 ## Test
 

@@ -3,8 +3,8 @@ import math
 import pytest
 
 from chatbot_contracts import samples
-from chatbot_contracts.corpus import PageFlags
 from chatbot_contracts.enums import SourceType
+from chatbot_contracts.knowledge_base import PageFlags
 from chatbot_platform import gate
 from chatbot_platform.gate import GateContext
 
@@ -86,9 +86,7 @@ def test_sme_decision_is_needed_for_new_documents(platform, upload):
     assert report.auto_passed and report.requires_sme and not report.approved
     stored = gate.record_sme_decision(platform.registry, report.report_id, approved=True, by="sme")
     assert stored.approved
-    assert (
-        platform.registry.get_corpus_version(manifest.version_id).gate_report_id == stored.report_id
-    )
+    assert platform.registry.get_kb_version(manifest.version_id).gate_report_id == stored.report_id
 
 
 def test_embedding_refresh_needs_no_sme(platform, upload, ingest):

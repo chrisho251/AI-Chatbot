@@ -1,9 +1,9 @@
 """Offline entrypoint of W6 embed. The pipeline lane runs it once per ingestion run.
 
 Read the CleanPage rows of the run, chunk them with chunker.chunk_pages, embed the
-chunks and write one ChunkSet with lake.write_chunk_set. The pipeline hands these
+chunks and write one ChunkSet with ingest.write_chunk_set. The pipeline hands these
 chunk sets to the quality gate.
-Dagster starts it in the w6 embed image with the run id and the document version.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

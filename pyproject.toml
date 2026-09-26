@@ -1,7 +1,7 @@
 [project]
 name = "ai-chatbot"
 version = "1.0.0"
-description = "Workspace root for the Health Science exam prep chatbot backend"
+description = "Workspace root for the AI-chatbot backend"
 requires-python = ">=3.12,<3.13"
 dependencies = []
 

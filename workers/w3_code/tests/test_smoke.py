@@ -2,9 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 from chatbot_contracts import samples
-from chatbot_contracts.routes import CODE
+from chatbot_contracts.routes import ALL_ENDPOINTS, CODE
 from chatbot_w3_code import job
-from chatbot_w3_code.serve import app
+from chatbot_w3_code.serve import HANDLERS, app
 
 CASES = [(CODE, samples.sample_code_task())]
 
@@ -23,3 +23,7 @@ def test_routes_accept_their_contract():
     for endpoint, request in CASES:
         response = client.post(endpoint.path, json=request.model_dump(mode="json"))
         assert response.status_code not in (404, 405, 422), endpoint.path
+
+
+def test_handlers_cover_every_w3_code_endpoint():
+    assert set(HANDLERS) == {e for e in ALL_ENDPOINTS if e.service == "w3_code"}

@@ -1,16 +1,16 @@
 # Pipelines
 
-The Dagster code location of the offline plane: ingestion, quality gate and publish, retention, lineage sweep, history snapshots, enrichment and scheduled evaluation.
+The Dagster code location of the offline plane: ingestion, quality gate and publish, retention, lineage sweep, enrichment and scheduled evaluation.
 
 **Owner:** Lane A.
-**Depends on:** `chatbot-platform` only. Worker code is never imported: each worker runs in its own image through Dagster Pipes (`steps.py`).
+**Depends on:** `chatbot-platform` only. Worker code is never imported: each worker step runs in its own container from the app image (`ai-chatbot/api`) through Dagster Pipes (`steps.py`).
 
 ## Files
 
 - `definitions.py`: the code location (`defs`).
-- `steps.py`: run a worker step in its image.
+- `steps.py`: run a worker step in its own container from the app image.
 - `ingestion.py`: ingest, build and gate, publish.
-- `sensors.py`, `schedules.py`, `snapshots.py`.
+- `sensors.py`, `schedules.py`.
 
 ## Start here
 
@@ -21,8 +21,11 @@ The Dagster code location of the offline plane: ingestion, quality gate and publ
 ## Run locally
 
 ```bash
+docker compose --profile core build api
 docker compose --profile data --profile pipeline up -d
 ```
+
+The first command builds the app image that the worker steps run in.
 
 Then open http://localhost:3000.
 

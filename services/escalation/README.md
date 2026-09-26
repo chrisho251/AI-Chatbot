@@ -4,9 +4,11 @@ The expert path of Level 3 (Appendix C.2). External search happens earlier, in W
 
 **Owner:** Lane A.
 **Endpoints:**
-- `POST /v1/tickets`: open a ticket (`routes.OPEN_TICKET`). The orchestrator is the caller.
-- `GET /v1/tickets/{request_id}`: read a ticket. The gateway uses it for late answers.
-- `POST /v1/tickets/{ticket_id}/answer`: the on-duty expert answers.
+- `routes.OPEN_TICKET`: open a ticket. The orchestrator is the caller.
+- `routes.GET_TICKET`: read the ticket of a request. The gateway uses it for late answers.
+- `POST /v1/tickets/{ticket_id}/answer`: the on-duty expert answers. This is the only public route.
+
+**Runs in:** the api service. It calls `serve.HANDLERS` in process and mounts `serve.router` for the expert route. `serve.app` serves everything alone for tests.
 
 **Writes:** `ops.escalation_tickets`. **Reads:** `ops.expert_rota`.
 

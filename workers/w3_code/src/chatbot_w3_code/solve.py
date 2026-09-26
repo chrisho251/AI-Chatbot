@@ -1,7 +1,7 @@
 """Solve a computational exercise at answer time. Stub owned by Lane D.
 
 Purpose
-Appendix A.4 asks W3 to generate, execute and check code in Excel, R and epidemiology exercises.
+Appendix A.4 asks W3 to generate, execute and check code in Excel, R and Python exercises.
 
 What to build
 generate.write_code for the task language, runner.run in the sandbox, then check.compare against

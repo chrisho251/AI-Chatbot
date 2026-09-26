@@ -12,5 +12,6 @@ class OrchestratorSettings(BaseSettings):
     l2_threshold: float = 0.50
     sufficiency_floor: float = 0.20
     retrieve_k: int = 8
+    history_turns: int = 4
     model_version: str = "qwen3-4b-instruct"
     prompt_version: str = "answer-v1"

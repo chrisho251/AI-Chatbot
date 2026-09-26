@@ -1,27 +1,31 @@
-"""Run one worker step in its own image. Stub owned by Lane A.
+"""Run one worker step in its own container. Stub owned by Lane A.
 
 Purpose
-One worker, one image. The pipeline never imports worker code. It starts the worker CLI in the
-worker image with Dagster Pipes, so each lane ships its worker on its own.
+One worker, one package, two entrypoints. Online the worker runs inside the api process. Offline
+the pipeline never imports worker code. It starts the worker job command in its own container from
+the app image, the same image the api service runs, with Dagster Pipes. Every step still gets its
+own container, so its logs, duration and resources are measured apart.
 
 What to build
-WORKER_IMAGES maps each worker to its image and job command, for example the W1 image with the
-chatbot w1 ingest job command. run_step starts it with PipesDockerClient locally and with the ECS
-Pipes client on AWS, passes run id and document version, streams logs and fails the Dagster step
-when the command fails. Record the image digest for the ingestion run lineage.
+WORKER_COMMANDS maps each worker to its job command. run_step starts APP_IMAGE with that command
+using PipesDockerClient locally and the ECS Pipes client on AWS, passes run id and document
+version, streams logs and fails the Dagster step when the command fails. Record the image digest
+for the ingestion run lineage.
 
 How to test
-Replace the images with a tiny image that echoes its arguments and assert the command line.
+Replace the image with a tiny image that echoes its arguments and assert the command line.
 """
 
-WORKER_IMAGES: dict[str, str] = {
-    "w1_ingest": "ai-chatbot/w1-ingest",
-    "w2_vision": "ai-chatbot/w2-vision",
-    "w3_code": "ai-chatbot/w3-code",
-    "w4_math": "ai-chatbot/w4-math",
-    "w5_clean": "ai-chatbot/w5-clean",
-    "w6_embed": "ai-chatbot/w6-embed",
-    "w7_deepsearch": "ai-chatbot/w7-deepsearch",
+APP_IMAGE = "ai-chatbot/api"
+
+WORKER_COMMANDS: dict[str, str] = {
+    "w1_ingest": "chatbot-w1-ingest-job",
+    "w2_vision": "chatbot-w2-vision-job",
+    "w3_code": "chatbot-w3-code-job",
+    "w4_math": "chatbot-w4-math-job",
+    "w5_clean": "chatbot-w5-clean-job",
+    "w6_embed": "chatbot-w6-embed-job",
+    "w7_deepsearch": "chatbot-w7-enrichment-job",
 }
 
 

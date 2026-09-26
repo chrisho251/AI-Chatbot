@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-w3-code"
-version = "1.0.0"
+version = "1.1.0"
 description = "W3 Worker code, generate run and check R Python and Excel solutions"
 requires-python = ">=3.12,<3.13"
 dependencies = [

@@ -1,7 +1,7 @@
 import pytest
 
 from chatbot_contracts import samples
-from chatbot_contracts.enums import CorpusStatus
+from chatbot_contracts.enums import KnowledgeBaseStatus
 from chatbot_platform.errors import VersioningError
 from chatbot_platform.gate import GateContext, record_sme_decision, run_gate
 from chatbot_platform.models import CANDIDATE_ALIAS, SERVING_ALIAS
@@ -18,7 +18,7 @@ def _visible_texts(platform, version):
 def test_first_publish_serves_all_chunks(platform, upload, ingest):
     document = upload(b"edition one")
     manifest = ingest({document.doc_version: TEXTS})
-    assert manifest.status == CorpusStatus.PUBLISHED
+    assert manifest.status == KnowledgeBaseStatus.PUBLISHED
     assert platform.registry.get_alias(SERVING_ALIAS) == manifest.version_id
     assert _visible_texts(platform, manifest.version_id) == sorted(TEXTS)
 
@@ -29,7 +29,7 @@ def test_correction_replaces_old_chunks_and_keeps_other_documents(platform, uplo
     first = ingest({notes.doc_version: ["Variance measures spread."], old.doc_version: TEXTS})
 
     new = upload(b"edition two")
-    corrected = [*TEXTS[:2], "The odds ratio compares odds between exposed and unexposed groups."]
+    corrected = [*TEXTS[:2], "The standard deviation is the square root of the variance."]
     second = ingest({new.doc_version: corrected})
 
     assert second.doc_versions == sorted([notes.doc_version, new.doc_version])

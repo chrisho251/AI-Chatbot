@@ -11,10 +11,10 @@ For M5 and M6, one EC2 GPU instance running the same `compose.yaml` with the `gp
 ## Modules to write
 
 - `network`: VPC, private subnets, security groups. The code sandbox gets a subnet with no egress.
-- `data`: S3 buckets (`raw`, `uploads`, `external`, `warehouse`, `mlflow`) with KMS encryption, RDS PostgreSQL with pgvector, the Glue catalog.
-- `compute`: ECR repositories, an ECS cluster for services and workers, one EC2 GPU host for vLLM and TEI.
-- `edge`: ALB with ACM certificates in front of the gateway, Cognito for identity.
-- `ops`: CloudWatch or Amazon Managed Prometheus and Grafana, SES for expert email, Secrets Manager.
+- `data`: S3 buckets (`raw`, `uploads`, `external`, `exports`, `mlflow`) with KMS encryption, RDS PostgreSQL with pgvector. Postgres is the only database, there is no catalog or query service to add.
+- `compute`: one ECR repository for the app image, an ECS service for the api container, the code sandbox as an ECS task with no egress, one EC2 GPU host for vLLM and TEI.
+- `edge`: ALB with ACM certificates in front of the public routes of the api service, Cognito for identity.
+- `ops`: CloudWatch or Amazon Managed Prometheus and Grafana, SES for expert email, KMS keys for pseudonyms and text encryption, Secrets Manager.
 
 ## Rules
 

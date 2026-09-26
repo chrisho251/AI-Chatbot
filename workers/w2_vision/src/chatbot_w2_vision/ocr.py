@@ -20,7 +20,7 @@ How to test
 Render a line of known text to a PNG in the test, run ocr_region and compare the words.
 """
 
-from chatbot_contracts.corpus import ExtractedRegion, Region
+from chatbot_contracts.knowledge_base import ExtractedRegion, Region
 
 
 def ocr_region(region: Region, image: bytes) -> ExtractedRegion:

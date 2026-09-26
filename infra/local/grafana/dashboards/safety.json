@@ -1,13 +1,13 @@
 {
   "uid": "chatbot-safety",
   "title": "Safety and misuse (Appendix B.2)",
-  "description": "Prompt injection and misuse detections. Details for reviewers are in obs.guard_events, without student identities.",
+  "description": "Prompt injection and misuse detections. Details for reviewers are in ops.guard_events, without student identities.",
   "tags": [
     "ai-chatbot"
   ],
   "editable": true,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
   "time": {
     "from": "now-6h",

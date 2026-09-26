@@ -22,6 +22,7 @@ htmlcov/
 .env
 *.pem
 infra/local/traefik/certs/
+infra/local/keys/
 
 # Local data, model weights and logs
 data/*

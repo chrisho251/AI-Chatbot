@@ -1,8 +1,8 @@
 """Offline entrypoint of W4 math. The pipeline lane runs it once per ingestion run.
 
-Read the equation regions of the run from corpus.regions, turn each into normalized
+Read the equation regions of the run from ingest.regions, turn each into normalized
 LaTeX with latex.normalize and append one ExtractedRegion per equation.
-Dagster starts it in the w4 math image with the run id and the document version.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

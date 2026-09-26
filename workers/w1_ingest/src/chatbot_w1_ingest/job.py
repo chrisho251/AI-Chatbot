@@ -2,8 +2,8 @@
 
 Load the raw file of the document version from the registry and object store, run
 layout analysis, set the page count with registry.set_page_count and append one
-Region per region to corpus.regions with lake.append_records.
-Dagster starts it in the w1 ingest image with the run id and the document version.
+Region per region to ingest.regions with ingest.append_records from chatbot_platform.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

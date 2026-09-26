@@ -2,7 +2,7 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "AI-chatbot: Ingestion, Source File to Published Corpus Version",
+    "title": "AI-chatbot: Ingestion, Source File to Published Knowledge Base Version",
     "locale": "en",
     "quality_profile": "showcase",
     "viewBox": [
@@ -152,10 +152,10 @@
       ]
     },
     {
-      "id": "lake",
+      "id": "ingest",
       "type": "database",
-      "label": "Iceberg tiers",
-      "sublabel": "cleaned/ · chunked/",
+      "label": "Postgres ingest",
+      "sublabel": "cleaned · staged chunks",
       "pos": [
         660,
         330
@@ -251,15 +251,15 @@
     {
       "id": "cleaned",
       "from": "cleaner",
-      "to": "lake",
-      "label": "cleaned/",
+      "to": "ingest",
+      "label": "cleaned pages",
       "labelDy": 24
     },
     {
       "id": "chunked",
       "from": "embedder",
-      "to": "lake",
-      "label": "chunked/ vN+1"
+      "to": "ingest",
+      "label": "staged chunks"
     },
     {
       "id": "embed",

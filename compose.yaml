@@ -1,5 +1,5 @@
 # Local stack. Start only the profiles a task needs, see docs/TECH_STACK.md section 3
-# Service hostnames here are the defaults of chatbot_common.settings.service_url
+# The api service runs the whole online plane in one process. Dagster runs worker steps from its image
 name: ai-chatbot
 
 x-python-service: &python-service
@@ -14,6 +14,7 @@ x-python-service: &python-service
     CHATBOT_EMBED_BASE_URL: http://tei-embed:80
     CHATBOT_RERANK_BASE_URL: http://tei-rerank:80
     CHATBOT_SANDBOX_URL: http://w3-sandbox:8000
+    CHATBOT_KEY_FILE: /run/keys/keys.json
   depends_on:
     postgres:
       condition: service_healthy
@@ -75,95 +76,19 @@ services:
     volumes:
       - ./infra/local/keycloak:/opt/keycloak/data/import:ro
 
-  vault:
-    image: hashicorp/vault:1.18.3
-    profiles: [core]
-    command: server -dev -dev-listen-address=0.0.0.0:8200
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: dev-root-token
-    cap_add: [IPC_LOCK]
-    ports: ["8200:8200"]
-
-  gateway:
+  api:
     <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-gateway } }
-    image: ai-chatbot/gateway
+    build: { <<: *build, args: { PACKAGE: chatbot-api } }
+    image: ai-chatbot/api
     profiles: [core]
-    command: ["uvicorn", "chatbot_gateway.serve:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["uvicorn", "chatbot_api.serve:app", "--host", "0.0.0.0", "--port", "8000"]
     ports: ["8000:8000"]
-
-  orchestrator:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-orchestrator } }
-    image: ai-chatbot/orchestrator
-    profiles: [core]
-    command: ["uvicorn", "chatbot_orchestrator.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  escalation:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-escalation } }
-    image: ai-chatbot/escalation
-    profiles: [core]
-    command: ["uvicorn", "chatbot_escalation.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w2-vision:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w2-vision } }
-    image: ai-chatbot/w2-vision
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w2_vision.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w3-code:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w3-code } }
-    image: ai-chatbot/w3-code
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w3_code.serve:app", "--host", "0.0.0.0", "--port", "8000"]
     networks: [default, sandbox]
-
-  w4-math:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w4-math } }
-    image: ai-chatbot/w4-math
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w4_math.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w5-clean:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w5-clean } }
-    image: ai-chatbot/w5-clean
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w5_clean.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w6-embed:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w6-embed } }
-    image: ai-chatbot/w6-embed
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w6_embed.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w7-deepsearch:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w7-deepsearch } }
-    image: ai-chatbot/w7-deepsearch
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w7_deepsearch.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  w8-gen:
-    <<: *python-service
-    build: { <<: *build, args: { PACKAGE: chatbot-w8-gen } }
-    image: ai-chatbot/w8-gen
-    profiles: [core]
-    command: ["uvicorn", "chatbot_w8_gen.serve:app", "--host", "0.0.0.0", "--port", "8000"]
-
-  # Profile images, offline only images that Dagster starts, never run directly
-
-  w1-ingest:
-    build: { <<: *build, args: { PACKAGE: chatbot-w1-ingest } }
-    image: ai-chatbot/w1-ingest
-    profiles: [images]
+    volumes:
+      - ./infra/local/keys:/run/keys:ro
 
   # Profile cpu, models on any machine. Pin exact model revisions in .env
+  # TEI also runs with the gpu profile, on CPU, because embeddings and reranking are light
 
   llm:
     image: ghcr.io/ggml-org/llama.cpp:server
@@ -175,7 +100,7 @@ services:
 
   tei-embed:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
-    profiles: [cpu]
+    profiles: [cpu, gpu]
     command: ["--model-id", "${EMBED_MODEL:-BAAI/bge-m3}"]
     ports: ["8081:80"]
     volumes:
@@ -183,7 +108,7 @@ services:
 
   tei-rerank:
     image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.7
-    profiles: [cpu]
+    profiles: [cpu, gpu]
     command: ["--model-id", "${RERANK_MODEL:-BAAI/bge-reranker-v2-m3}"]
     ports: ["8082:80"]
     volumes:
@@ -271,42 +196,29 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  # Profile finetune, the optional fine tuning phase. MLflow keeps its registry in SQLite in its volume
+
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.1.0
-    profiles: [pipeline]
+    profiles: [finetune]
     command: ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--artifacts-destination", "/mlflow/artifacts"]
     ports: ["5000:5000"]
     volumes:
       - mlflow:/mlflow
 
-  # Profile obs, monitoring for Appendix B
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.119.0
-    profiles: [obs]
-    command: ["--config=/etc/otel/collector.yaml"]
-    ports: ["4317:4317", "4318:4318"]
-    volumes:
-      - ./infra/local/otel/collector.yaml:/etc/otel/collector.yaml:ro
+  # Profile obs, monitoring for Appendix B. Prometheus keeps 90 days, enough for a milestone review
 
   prometheus:
     image: prom/prometheus:v3.1.0
     profiles: [obs]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=90d
     ports: ["9090:9090"]
     volumes:
       - ./infra/local/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-
-  loki:
-    image: grafana/loki:3.3.2
-    profiles: [obs]
-    ports: ["3100:3100"]
-
-  tempo:
-    image: grafana/tempo:2.7.0
-    profiles: [obs]
-    command: ["-config.file=/etc/tempo/tempo.yaml"]
-    volumes:
-      - ./infra/local/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - prometheus:/prometheus
 
   grafana:
     image: grafana/grafana:11.5.0
@@ -328,6 +240,28 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
 
+  # Profile traces, optional traces and logs. Set CHATBOT_OTEL_ENDPOINT to send them here
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    profiles: [traces]
+    command: ["--config=/etc/otel/collector.yaml"]
+    ports: ["4317:4317", "4318:4318"]
+    volumes:
+      - ./infra/local/otel/collector.yaml:/etc/otel/collector.yaml:ro
+
+  loki:
+    image: grafana/loki:3.3.2
+    profiles: [traces]
+    ports: ["3100:3100"]
+
+  tempo:
+    image: grafana/tempo:2.7.0
+    profiles: [traces]
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./infra/local/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+
   # Profile dev, local email capture
 
   mailpit:
@@ -345,3 +279,4 @@ volumes:
   seaweed:
   models:
   mlflow:
+  prometheus:

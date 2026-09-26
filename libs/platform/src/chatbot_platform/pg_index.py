@@ -9,7 +9,7 @@ from collections.abc import Collection, Sequence
 from sqlalchemy import Engine, and_, func, or_, select, text, update
 from sqlalchemy.dialects.postgresql import insert
 
-from chatbot_contracts.corpus import Chunk, ChunkSet
+from chatbot_contracts.knowledge_base import Chunk, ChunkSet
 from chatbot_platform.models import IndexHit, StoredChunk
 from chatbot_platform.sql import serving_tables
 

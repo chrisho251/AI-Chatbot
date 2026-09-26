@@ -1,6 +1,6 @@
 # W4 math
 
-Worker-math from Appendix A.4. Two roles in one image:
+Worker-math from Appendix A.4. Two roles in one package:
 
 - **Offline (ingest):** turns equations into normalized LaTeX.
 - **Online (answer time):** computes and verifies values for W8, with SymPy and a catalogue of statistical operations.

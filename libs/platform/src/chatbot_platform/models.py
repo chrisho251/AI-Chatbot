@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 
 from chatbot_contracts.base import Model
-from chatbot_contracts.corpus import Chunk
+from chatbot_contracts.knowledge_base import Chunk
 
 SERVING_ALIAS = "serving"
 CANDIDATE_ALIAS = "candidate"

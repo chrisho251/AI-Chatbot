@@ -8,7 +8,7 @@ What to build
 The query arrives PII stripped. Query the sources in the sources package in parallel with a
 timeout, drop any url that allowlist.is_allowed rejects, fetch and snapshot the pages into the
 external bucket, send the HTML to W5 with origin external and drop pages W5 marks as dropped.
-Queue every kept page with candidates.queue so an SME can add it to the corpus later.
+Queue every kept page with candidates.queue so an SME can add it to the knowledge base later.
 Record the time spent, it feeds the external response time metric.
 
 How to test

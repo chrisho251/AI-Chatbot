@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-pipelines"
-version = "1.0.0"
+version = "1.1.0"
 description = "Dagster definitions for the offline plane"
 requires-python = ">=3.12,<3.13"
 dependencies = [
