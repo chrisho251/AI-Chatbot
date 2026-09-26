@@ -1,21 +1,12 @@
-# Scrapes every service, the model servers, containers and GPUs every 15 seconds
+# Scrapes the api service, the model servers, containers and GPUs every 15 seconds
 # Targets of profiles that are not running simply show as down on the resources dashboard
+# A worker moved to its own container is added to the services job with its compose name
 global:
   scrape_interval: 15s
 scrape_configs:
   - job_name: services
     static_configs:
-      - targets:
-          - gateway:8000
-          - orchestrator:8000
-          - escalation:8000
-          - w2-vision:8000
-          - w3-code:8000
-          - w4-math:8000
-          - w5-clean:8000
-          - w6-embed:8000
-          - w7-deepsearch:8000
-          - w8-gen:8000
+      - targets: [api:8000]
   - job_name: llm
     static_configs:
       - targets: [llm:8080]

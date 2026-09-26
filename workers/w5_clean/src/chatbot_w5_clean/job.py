@@ -2,9 +2,9 @@
 
 Join the text regions and the ExtractedRegion rows of every page in reading order,
 normalize, strip boilerplate, scrub PII, scan for injected instructions and mark
-duplicates. Append exactly one CleanPage per page to corpus.cleaned_pages, blank
+duplicates. Append exactly one CleanPage per page to ingest.cleaned_pages, blank
 pages included, with PageFlags filled in for the quality gate.
-Dagster starts it in the w5 clean image with the run id and the document version.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

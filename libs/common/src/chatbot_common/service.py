@@ -1,20 +1,25 @@
-"""FastAPI app factory and server sent events helper.
+"""FastAPI app factory, contract routes and server sent events helper.
 
 Every service starts from create_app, so health checks, metrics and error handling look the same
 everywhere. Code that is not written yet raises NotImplementedError, and the app answers 501 for it.
+add_contract_routes serves the local handlers of a component over HTTP, so a worker answers the
+same way inside the api process and in its own container.
 Prometheus scrapes the metrics route of every service, see chatbot_common.metrics.
 """
 
+import inspect
 import json
 import logging
 import time
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from chatbot_common.http import LocalHandler
 from chatbot_common.metrics import HTTP_DURATION, exposition
 from chatbot_contracts.escalation import StreamEvent
+from chatbot_contracts.routes import Endpoint
 
 SSE_MEDIA_TYPE = "text/event-stream"
 UNTRACKED_PATHS = frozenset({"/health", "/metrics"})
@@ -54,6 +59,34 @@ def create_app(service: str) -> FastAPI:
         return JSONResponse(status_code=501, content={"detail": str(error) or "not implemented"})
 
     return app
+
+
+def add_contract_routes(app: FastAPI, handlers: Mapping[Endpoint, LocalHandler]) -> None:
+    """Register one POST route per endpoint. Streamed endpoints answer with server sent events."""
+    for endpoint, handler in handlers.items():
+        streaming = endpoint.response is StreamEvent
+        app.add_api_route(
+            endpoint.path,
+            _contract_route(endpoint, handler, streaming),
+            methods=["POST"],
+            response_model=None if streaming else endpoint.response,
+            name=endpoint.path,
+        )
+
+
+def _contract_route(
+    endpoint: Endpoint, handler: LocalHandler, streaming: bool
+) -> Callable[..., Awaitable[object]]:
+    async def route(request: object) -> object:
+        if streaming:
+            return sse_response(handler(request))
+        return await handler(request)
+
+    parameter = inspect.Parameter(
+        "request", inspect.Parameter.POSITIONAL_OR_KEYWORD, annotation=endpoint.request
+    )
+    route.__signature__ = inspect.Signature([parameter])  # type: ignore[attr-defined]
+    return route
 
 
 def encode_event(event: StreamEvent) -> str:

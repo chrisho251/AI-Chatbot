@@ -72,9 +72,9 @@ def test_requests_and_escalation_views(pg_engine):
 
 
 @pytest.mark.integration
-def test_corpus_status_view(pg_engine):
+def test_kb_status_view(pg_engine):
     with pg_engine.connect() as conn:
-        status = conn.execute(text("SELECT * FROM reporting.corpus_status")).mappings().one()
+        status = conn.execute(text("SELECT * FROM reporting.kb_status")).mappings().one()
     assert status["serving_version"] is None
     assert status["pending_documents"] == 0
 

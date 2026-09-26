@@ -72,7 +72,7 @@ def test_dense_search_ranks_the_closest_chunk_first(index, chunk_set):
 def test_lexical_search_finds_matching_terms(index, chunk_set):
     index.add_chunk_set(chunk_set)
     index.open_intervals(_ids(chunk_set), 1)
-    hits = index.search_lexical("odds ratio", 1, k=3)
+    hits = index.search_lexical("standard deviation", 1, k=3)
     assert hits[0].chunk.chunk.text == samples.PAGE_TEXTS[2]
 
 

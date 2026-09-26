@@ -2,10 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from chatbot_contracts import samples
-from chatbot_contracts.routes import EXTERNAL_SEARCH, RETRIEVE
+from chatbot_contracts.routes import ALL_ENDPOINTS, EXTERNAL_SEARCH, RETRIEVE
 from chatbot_w7_deepsearch import job
 from chatbot_w7_deepsearch.allowlist import is_allowed
-from chatbot_w7_deepsearch.serve import app
+from chatbot_w7_deepsearch.serve import HANDLERS, app
 
 CASES = [
     (RETRIEVE, samples.sample_retrieval_request()),
@@ -33,10 +33,14 @@ def test_job_needs_a_course_and_topics():
     ("url", "allowed"),
     [
         ("https://openstax.org/books/x", True),
-        ("https://www.ncbi.nlm.nih.gov/pmc/articles/1", True),
+        ("https://math.libretexts.org/Bookshelves/Statistics", True),
         ("https://evil-openstax.org/x", False),
         ("https://example.com", False),
     ],
 )
 def test_allowlist(url, allowed):
     assert is_allowed(url) is allowed
+
+
+def test_handlers_cover_every_w7_deepsearch_endpoint():
+    assert set(HANDLERS) == {e for e in ALL_ENDPOINTS if e.service == "w7_deepsearch"}

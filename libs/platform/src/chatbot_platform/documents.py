@@ -7,9 +7,9 @@ supersedes the previous one. Uploading the exact same file twice returns the exi
 
 from pathlib import PurePath
 
-from chatbot_contracts.corpus import DocumentVersion
 from chatbot_contracts.enums import SourceType
 from chatbot_contracts.ids import make_doc_id, make_doc_version, sha256_hex
+from chatbot_contracts.knowledge_base import DocumentVersion
 from chatbot_platform.errors import VersioningError
 from chatbot_platform.registry import Registry
 from chatbot_platform.settings import RAW_BUCKET
@@ -64,5 +64,5 @@ def register_document(
 
 
 def retract_document(registry: Registry, doc_version: str) -> None:
-    """Withdraw a version with no replacement. The next candidate drops it from the corpus."""
+    """Withdraw a version with no replacement. The next candidate drops it."""
     registry.retract(doc_version)

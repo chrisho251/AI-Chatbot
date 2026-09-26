@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-w8-gen"
-version = "1.0.0"
+version = "1.1.0"
 description = "W8 Worker gen, grounded prompt, streamed cited answer and tool calls to W3 and W4"
 requires-python = ">=3.12,<3.13"
 dependencies = [

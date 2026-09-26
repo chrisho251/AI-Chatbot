@@ -1,12 +1,12 @@
 # W6 embed
 
-Worker-embed from Appendix A.4. Two roles in one image:
+Worker-embed from Appendix A.4. Two roles in one package:
 
 - **Offline (ingest):** structure-aware chunking and embedding of cleaned pages into a `ChunkSet`.
-- **Online (answer time):** embeds the student question with the model pinned to the serving corpus version.
+- **Online (answer time):** embeds the student question with the model pinned to the serving knowledge base version.
 
 **Owner:** Lane B.
-**Offline reads:** `corpus.cleaned_pages`. **Writes:** `corpus.chunks` through `lake.write_chunk_set`.
+**Offline reads:** `ingest.cleaned_pages`. **Writes:** `ingest.chunks` through `chatbot_platform.ingest.write_chunk_set`.
 **Online endpoint:** `POST /v1/embed`, `EmbedRequest` to `EmbedResult`.
 
 ## Files

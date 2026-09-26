@@ -1,4 +1,4 @@
-"""Registry of document versions, ingestion runs, corpus versions, aliases and gate reports.
+"""Registry of document versions, ingestion runs, knowledge base versions, aliases, gate reports.
 
 The registry is the source of truth for versions. It runs on Postgres in every environment and on
 SQLite in unit tests.
@@ -10,8 +10,8 @@ from typing import Any
 
 from sqlalchemy import Engine, func, insert, select, update
 
-from chatbot_contracts.corpus import CorpusManifest, DocumentVersion
-from chatbot_contracts.enums import CorpusStatus
+from chatbot_contracts.enums import KnowledgeBaseStatus
+from chatbot_contracts.knowledge_base import DocumentVersion, KnowledgeBaseManifest
 from chatbot_platform import sql
 from chatbot_platform.errors import NotFoundError
 from chatbot_platform.models import CheckResult, GateReport, RunStatus, SmeDecision
@@ -24,7 +24,7 @@ class Registry:
         self.engine = engine
 
     def create_tables(self) -> None:
-        """Create the registry and ops tables. Postgres uses migrations instead, see migrate.py."""
+        """Create every portable table. Postgres uses migrations instead, see migrate.py."""
         sql.metadata.create_all(self.engine)
 
     # Document versions
@@ -140,37 +140,37 @@ class Registry:
         with self.engine.connect() as conn:
             return list(conn.execute(query).scalars())
 
-    # Corpus versions and aliases
+    # Knowledge base versions and aliases
 
     def next_version_id(self) -> int:
         with self.engine.connect() as conn:
-            current = conn.execute(select(func.max(sql.corpus_versions.c.version_id))).scalar()
+            current = conn.execute(select(func.max(sql.kb_versions.c.version_id))).scalar()
         return (current or 0) + 1
 
-    def add_corpus_version(self, manifest: CorpusManifest) -> None:
+    def add_kb_version(self, manifest: KnowledgeBaseManifest) -> None:
         row = manifest.model_dump(exclude={"schema_version", "producer"})
         row["created_at"] = sql.utcnow()
         with self.engine.begin() as conn:
-            conn.execute(insert(sql.corpus_versions).values(row))
+            conn.execute(insert(sql.kb_versions).values(row))
 
-    def get_corpus_version(self, version_id: int) -> CorpusManifest:
-        query = select(sql.corpus_versions).where(sql.corpus_versions.c.version_id == version_id)
+    def get_kb_version(self, version_id: int) -> KnowledgeBaseManifest:
+        query = select(sql.kb_versions).where(sql.kb_versions.c.version_id == version_id)
         with self.engine.connect() as conn:
             row = conn.execute(query).mappings().first()
         if row is None:
-            raise NotFoundError(f"unknown corpus version {version_id}")
+            raise NotFoundError(f"unknown knowledge base version {version_id}")
         return _manifest_from_row(row)
 
-    def list_corpus_versions(self) -> list[CorpusManifest]:
-        query = select(sql.corpus_versions).order_by(sql.corpus_versions.c.version_id)
+    def list_kb_versions(self) -> list[KnowledgeBaseManifest]:
+        query = select(sql.kb_versions).order_by(sql.kb_versions.c.version_id)
         with self.engine.connect() as conn:
             return [_manifest_from_row(row) for row in conn.execute(query).mappings()]
 
-    def latest_published(self) -> CorpusManifest | None:
-        table = sql.corpus_versions
+    def latest_published(self) -> KnowledgeBaseManifest | None:
+        table = sql.kb_versions
         query = (
             select(table)
-            .where(table.c.status == CorpusStatus.PUBLISHED)
+            .where(table.c.status == KnowledgeBaseStatus.PUBLISHED)
             .order_by(table.c.version_id.desc())
             .limit(1)
         )
@@ -178,25 +178,23 @@ class Registry:
             row = conn.execute(query).mappings().first()
         return _manifest_from_row(row) if row else None
 
-    def set_corpus_status(
-        self, version_id: int, status: CorpusStatus, gate_report_id: str | None = None
+    def set_kb_status(
+        self, version_id: int, status: KnowledgeBaseStatus, gate_report_id: str | None = None
     ) -> None:
         values: dict[str, Any] = {"status": status}
         if gate_report_id is not None:
             values["gate_report_id"] = gate_report_id
-        if status == CorpusStatus.PUBLISHED:
+        if status == KnowledgeBaseStatus.PUBLISHED:
             values["published_at"] = sql.utcnow()
-        self._update_one(
-            sql.corpus_versions, sql.corpus_versions.c.version_id, version_id, **values
-        )
+        self._update_one(sql.kb_versions, sql.kb_versions.c.version_id, version_id, **values)
 
     def get_alias(self, name: str) -> int | None:
-        query = select(sql.corpus_aliases.c.version_id).where(sql.corpus_aliases.c.name == name)
+        query = select(sql.kb_aliases.c.version_id).where(sql.kb_aliases.c.name == name)
         with self.engine.connect() as conn:
             return conn.execute(query).scalar()
 
     def set_alias(self, name: str, version_id: int) -> None:
-        table = sql.corpus_aliases
+        table = sql.kb_aliases
         with self.engine.begin() as conn:
             moved = conn.execute(
                 update(table)
@@ -251,6 +249,6 @@ def _doc_from_row(row: Mapping[str, Any]) -> DocumentVersion:
     return DocumentVersion(**{field: row[field] for field in _DOC_FIELDS if field in row})
 
 
-def _manifest_from_row(row: Mapping[str, Any]) -> CorpusManifest:
-    fields = set(CorpusManifest.model_fields) - {"schema_version", "producer"}
-    return CorpusManifest(**{field: row[field] for field in fields})
+def _manifest_from_row(row: Mapping[str, Any]) -> KnowledgeBaseManifest:
+    fields = set(KnowledgeBaseManifest.model_fields) - {"schema_version", "producer"}
+    return KnowledgeBaseManifest(**{field: row[field] for field in fields})

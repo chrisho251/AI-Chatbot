@@ -20,7 +20,7 @@ Fake the ChatClient with an httpx MockTransport and assert the request carries t
 """
 
 from chatbot_common.llm import ChatClient
-from chatbot_contracts.corpus import ExtractedRegion, Region
+from chatbot_contracts.knowledge_base import ExtractedRegion, Region
 
 
 async def caption_figure(region: Region, image: bytes, llm: ChatClient) -> ExtractedRegion:

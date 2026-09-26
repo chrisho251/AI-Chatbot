@@ -1,6 +1,7 @@
-"""HTTP endpoints of every online component, with their request and response records.
+"""Endpoints of every online component, with their request and response records.
 
 Servers register routes from these definitions and clients call them, so paths never drift.
+Inside the api process the same endpoints are local handlers, called as functions without HTTP.
 Endpoints whose response is StreamEvent send server sent events instead of one JSON body.
 """
 
@@ -8,7 +9,7 @@ from dataclasses import dataclass
 
 from pydantic import BaseModel
 
-from chatbot_contracts.escalation import EscalationTicket, StreamEvent
+from chatbot_contracts.escalation import EscalationTicket, StreamEvent, TicketQuery
 from chatbot_contracts.external import ExternalSearchRequest, ExternalSearchResult
 from chatbot_contracts.query import (
     AskRequest,
@@ -47,6 +48,7 @@ EXTERNAL_SEARCH = Endpoint(
 GENERATE = Endpoint("w8_gen", "/v1/generate", GenerationRequest, GenerationResult)
 GENERATE_STREAM = Endpoint("w8_gen", "/v1/generate/stream", GenerationRequest, StreamEvent)
 OPEN_TICKET = Endpoint("escalation", "/v1/tickets", EscalationTicket, EscalationTicket)
+GET_TICKET = Endpoint("escalation", "/v1/tickets/lookup", TicketQuery, EscalationTicket)
 
 ALL_ENDPOINTS = (
     ANSWER,
@@ -60,4 +62,5 @@ ALL_ENDPOINTS = (
     GENERATE,
     GENERATE_STREAM,
     OPEN_TICKET,
+    GET_TICKET,
 )

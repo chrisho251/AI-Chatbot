@@ -3,8 +3,9 @@
 Dataset build, SME approval gate, QLoRA training, evaluation and registry, following [ARCHITECTURE.md](../../docs/architecture/ARCHITECTURE.md), section 7, and Appendix A.5.
 
 **Owner:** Lane D.
-**Writes:** `ft.datasets`, `ft.items`, and MLflow models.
+**Writes:** `ft.datasets`, `ft.items`, one Parquet export per dataset version in the `exports` bucket, and MLflow models.
 **Hardware:** training needs an NVIDIA GPU. Everything else runs on any machine.
+**Phase:** optional and later. Start only when RAGAs shows that generation, not retrieval, limits answer quality. MLflow runs in the `finetune` compose profile.
 
 ## Files
 

@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
 from chatbot_contracts import samples
-from chatbot_contracts.routes import ANSWER
-from chatbot_orchestrator.serve import app
+from chatbot_contracts.routes import ALL_ENDPOINTS, ANSWER
+from chatbot_orchestrator.serve import HANDLERS, app
 
 
 def test_health():
@@ -14,3 +14,7 @@ def test_answer_route_accepts_the_contract():
         ANSWER.path, json=samples.sample_ask_request().model_dump(mode="json")
     )
     assert response.status_code not in (404, 405, 422)
+
+
+def test_handlers_cover_every_orchestrator_endpoint():
+    assert set(HANDLERS) == {e for e in ALL_ENDPOINTS if e.service == "orchestrator"}

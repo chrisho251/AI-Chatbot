@@ -20,7 +20,7 @@ class RegionKind(StrEnum):
     CODE = "code"
 
 
-class CorpusStatus(StrEnum):
+class KnowledgeBaseStatus(StrEnum):
     CANDIDATE = "candidate"
     PUBLISHED = "published"
     REJECTED = "rejected"

@@ -11,7 +11,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from chatbot_contracts.enums import SourceType
-from chatbot_platform import documents, lake, lineage, migrate, retention, versioning
+from chatbot_platform import documents, lineage, migrate, retention, versioning
 from chatbot_platform.factory import Platform, build_platform
 from chatbot_platform.models import CANDIDATE_ALIAS, SERVING_ALIAS
 from chatbot_platform.settings import BUCKETS
@@ -25,9 +25,7 @@ def cmd_init(platform: Platform, _args: argparse.Namespace) -> None:
     migrate.upgrade(platform.settings.database_url, platform.settings.embedding_dim)
     for bucket in BUCKETS:
         platform.store.ensure_bucket(bucket)
-    _print(
-        {"database": "migrated", "buckets": BUCKETS, "tables": lake.ensure_tables(platform.catalog)}
-    )
+    _print({"database": "migrated", "buckets": BUCKETS})
 
 
 def cmd_upload(platform: Platform, args: argparse.Namespace) -> None:
@@ -55,7 +53,7 @@ def cmd_status(platform: Platform, _args: argparse.Namespace) -> None:
             "candidate": registry.get_alias(CANDIDATE_ALIAS),
             "versions": [
                 {"version": m.version_id, "status": m.status, "documents": len(m.doc_versions)}
-                for m in registry.list_corpus_versions()
+                for m in registry.list_kb_versions()
             ],
             "pending_documents": registry.pending_doc_versions(),
         }
@@ -78,9 +76,7 @@ def cmd_sweep_lineage(platform: Platform, _args: argparse.Namespace) -> None:
 
 
 def cmd_retention(platform: Platform, _args: argparse.Namespace) -> None:
-    results = retention.run_retention(
-        platform.engine, platform.store, platform.catalog, platform.settings
-    )
+    results = retention.run_retention(platform.engine, platform.store, platform.settings)
     _print([{"target": result.target, "deleted": result.deleted} for result in results])
 
 
@@ -88,7 +84,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="chatbot-platform", description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
 
-    commands.add_parser("init", help="migrate the database, create buckets and lake tables")
+    commands.add_parser("init", help="migrate the database and create the buckets")
 
     upload = commands.add_parser("upload", help="register a source file")
     upload.add_argument("file")
@@ -98,7 +94,7 @@ def build_parser() -> argparse.ArgumentParser:
     upload.add_argument("--licence")
     upload.add_argument("--url")
 
-    commands.add_parser("status", help="show aliases, corpus versions and pending documents")
+    commands.add_parser("status", help="show aliases, versions and pending documents")
 
     rollback = commands.add_parser("rollback", help="point serving at an older published version")
     rollback.add_argument("version", type=int)

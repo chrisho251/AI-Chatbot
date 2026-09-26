@@ -6,4 +6,4 @@ class NotFoundError(LookupError):
 
 
 class VersioningError(ValueError):
-    """A corpus version operation would break the versioning rules."""
+    """A knowledge base version operation would break the versioning rules."""

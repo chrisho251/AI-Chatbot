@@ -35,6 +35,14 @@ def test_lanes_only_share_libraries():
     assert boundaries.violations(boundaries.members()) == []
     graph = {"chatbot-w8-gen": {"chatbot-w4-math"}, "chatbot-platform": {"chatbot-common"}}
     assert len(boundaries.violations(graph)) == 2
+    composed = {
+        "chatbot-api": {"chatbot-w8-gen", "chatbot-gateway"},
+        "chatbot-w8-gen": {"chatbot-api"},
+        "chatbot-gateway": set(),
+        "chatbot-pipelines": set(),
+    }
+    assert boundaries.violations(composed) == ["chatbot-w8-gen must not depend on chatbot-api"]
+    assert boundaries.violations({"chatbot-api": {"chatbot-pipelines"}, "chatbot-pipelines": set()})
 
 
 def test_dashboards_match_metrics_views_and_data_sources():

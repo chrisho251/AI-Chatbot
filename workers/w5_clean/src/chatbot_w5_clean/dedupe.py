@@ -7,7 +7,7 @@ duplicate rate is above the threshold in PlatformSettings.
 
 Input
 The pages of the current run keyed by document version and page number, plus the MinHash
-signatures of pages already in the corpus.
+signatures of pages already in the knowledge base.
 
 Output
 A mapping from a duplicate page key to the key of the page it copies. W5 stores that key in
@@ -15,8 +15,8 @@ PageFlags.dup_of.
 
 What to build
 datasketch MinHash over word shingles with an LSH index, a Jaccard threshold around 0.9.
-Persist signatures so later runs compare against the whole corpus, for example as a column in a
-new Iceberg table owned by this worker.
+Persist signatures so later runs compare against the whole knowledge base, for example in a new
+table of the ingest schema owned by this worker, added with a platform migration.
 
 How to test
 Two pages that differ by one word are duplicates, two unrelated pages are not.

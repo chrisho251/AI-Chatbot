@@ -2,7 +2,8 @@
 
 Purpose
 Generated code is untrusted. It only runs in the sandbox container, which has no network, no root,
-a read only filesystem and CPU, memory and time limits. Only W3 can reach it, see compose.yaml.
+a read only filesystem and CPU, memory and time limits. Only the api service, which runs W3,
+can reach it, see compose.yaml.
 Excel formulas run in process with excel.evaluate because they cannot touch the system.
 
 What to build

@@ -29,7 +29,7 @@
       "id": "models",
       "type": "backend",
       "label": "LLM serving",
-      "sublabel": "Qwen3 4B · adapters",
+      "sublabel": "Qwen3 · open weights",
       "pos": [
         870,
         40
@@ -197,7 +197,7 @@
   "boundaries": [
     {
       "kind": "region",
-      "label": "Backend API · gateway + query orchestrator",
+      "label": "api process · gateway, orchestrator and workers",
       "wraps": [
         "guard",
         "prep",

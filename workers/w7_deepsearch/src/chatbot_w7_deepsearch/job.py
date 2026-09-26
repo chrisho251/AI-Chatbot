@@ -2,7 +2,7 @@
 
 Purpose
 For each course topic, search allowlisted sources for exercises with answer keys and queue the finds
-as candidates with found_by enrichment. Nothing enters the corpus without SME triage.
+as candidates with found_by enrichment. Nothing enters the knowledge base without SME triage.
 """
 
 import argparse

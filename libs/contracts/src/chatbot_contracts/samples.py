@@ -12,29 +12,18 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from chatbot_contracts.corpus import (
-    Chunk,
-    ChunkSet,
-    CleanPage,
-    CorpusManifest,
-    DocumentVersion,
-    ExtractedRegion,
-    Extractor,
-    PageFlags,
-    Region,
-)
 from chatbot_contracts.enums import (
     CandidateOrigin,
     CleanOrigin,
     CodeLanguage,
-    CorpusStatus,
     EscalationStatus,
     EventType,
+    KnowledgeBaseStatus,
     RegionKind,
     SourceType,
     Verdict,
 )
-from chatbot_contracts.escalation import EscalationTicket, StreamEvent
+from chatbot_contracts.escalation import EscalationTicket, StreamEvent, TicketQuery
 from chatbot_contracts.external import (
     ExternalCandidate,
     ExternalItem,
@@ -42,6 +31,17 @@ from chatbot_contracts.external import (
     ExternalSearchResult,
 )
 from chatbot_contracts.ids import make_chunk_id, make_doc_id, make_doc_version, sha256_hex
+from chatbot_contracts.knowledge_base import (
+    Chunk,
+    ChunkSet,
+    CleanPage,
+    DocumentVersion,
+    ExtractedRegion,
+    Extractor,
+    KnowledgeBaseManifest,
+    PageFlags,
+    Region,
+)
 from chatbot_contracts.query import (
     AskRequest,
     Attachment,
@@ -55,6 +55,7 @@ from chatbot_contracts.query import (
     RetrievalRequest,
     RetrievalResult,
     RetrievedChunk,
+    Turn,
     VisionRequest,
     VisionResult,
 )
@@ -70,10 +71,11 @@ DOC_ID = make_doc_id(COURSE_CODE, SOURCE_ID)
 DOC_VERSION = make_doc_version(DOC_ID, FILE_SHA256)
 RUN_ID = "run-0001"
 REQUEST_ID = "req-0001"
+CONVERSATION_ID = "conv-0001"
 PAGE_TEXTS = (
     "The mean is the sum of the values divided by the number of values.",
     "A confidence interval gives a range of plausible values for a parameter.",
-    "The odds ratio compares the odds of an outcome between two groups.",
+    "The standard deviation measures how far values spread from the mean.",
 )
 
 
@@ -192,15 +194,15 @@ def sample_chunk_set(
     return _build(ChunkSet, defaults, overrides)
 
 
-def sample_manifest(**overrides: Any) -> CorpusManifest:
+def sample_manifest(**overrides: Any) -> KnowledgeBaseManifest:
     defaults = {
         "version_id": 1,
         "doc_versions": [DOC_VERSION],
         "embedding_model": EMBEDDING_MODEL,
         "chunker_version": CHUNKER_VERSION,
-        "status": CorpusStatus.CANDIDATE,
+        "status": KnowledgeBaseStatus.CANDIDATE,
     }
-    return _build(CorpusManifest, defaults, overrides)
+    return _build(KnowledgeBaseManifest, defaults, overrides)
 
 
 def sample_attachment(**overrides: Any) -> Attachment:
@@ -220,6 +222,7 @@ def sample_ask_request(**overrides: Any) -> AskRequest:
     defaults = {
         "request_id": REQUEST_ID,
         "pseudo_user": "pseudo-7f3a",
+        "conversation_id": CONVERSATION_ID,
         "question": "How do I compute a 95 percent confidence interval for a mean?",
     }
     return _build(AskRequest, defaults, overrides)
@@ -259,7 +262,7 @@ def sample_embed_request(**overrides: Any) -> EmbedRequest:
     defaults = {
         "request_id": REQUEST_ID,
         "texts": [sample_ask_request().question],
-        "corpus_version": 1,
+        "kb_version": 1,
     }
     return _build(EmbedRequest, defaults, overrides)
 
@@ -279,7 +282,7 @@ def sample_retrieval_request(**overrides: Any) -> RetrievalRequest:
         "request_id": REQUEST_ID,
         "question": question,
         "query_vector": sample_embedding(question),
-        "corpus_version": 1,
+        "kb_version": 1,
     }
     return _build(RetrievalRequest, defaults, overrides)
 
@@ -316,6 +319,7 @@ def sample_generation_request(**overrides: Any) -> GenerationRequest:
         "contexts": [sample_retrieved_chunk()],
         "model_version": "qwen3-4b-instruct",
         "prompt_version": "answer-v1",
+        "history": [Turn(question="What is a mean?", answer="The sum divided by the count [1].")],
     }
     return _build(GenerationRequest, defaults, overrides)
 
@@ -420,8 +424,17 @@ def sample_escalation_ticket(**overrides: Any) -> EscalationTicket:
     return _build(EscalationTicket, defaults, overrides)
 
 
+def sample_ticket_query(**overrides: Any) -> TicketQuery:
+    return _build(TicketQuery, {"request_id": REQUEST_ID}, overrides)
+
+
 def sample_stream_event(**overrides: Any) -> StreamEvent:
-    defaults = {"request_id": REQUEST_ID, "type": EventType.ANSWER_DELTA, "text": "Take the "}
+    defaults = {
+        "request_id": REQUEST_ID,
+        "type": EventType.ANSWER_DELTA,
+        "text": "Take the ",
+        "conversation_id": CONVERSATION_ID,
+    }
     return _build(StreamEvent, defaults, overrides)
 
 
@@ -432,7 +445,7 @@ SAMPLES: dict[type[BaseModel], Callable[..., BaseModel]] = {
     CleanPage: sample_clean_page,
     Chunk: sample_chunk,
     ChunkSet: sample_chunk_set,
-    CorpusManifest: sample_manifest,
+    KnowledgeBaseManifest: sample_manifest,
     Attachment: sample_attachment,
     AskRequest: sample_ask_request,
     VisionRequest: sample_vision_request,
@@ -455,6 +468,7 @@ SAMPLES: dict[type[BaseModel], Callable[..., BaseModel]] = {
     ExternalSearchResult: sample_external_search_result,
     ExternalCandidate: sample_external_candidate,
     EscalationTicket: sample_escalation_ticket,
+    TicketQuery: sample_ticket_query,
     StreamEvent: sample_stream_event,
 }
 """One factory per record type, used by tests that must cover every contract."""

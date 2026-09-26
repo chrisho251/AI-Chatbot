@@ -1,8 +1,10 @@
-"""SQL tables of the chatbot database.
+"""SQL tables of the chatbot database. Postgres is the only database of the platform.
 
-metadata holds the registry and ops schemas. They only use portable types, so unit tests can run
-them on SQLite. The serving schema needs pgvector and full text search, so it only exists on
-Postgres and is built by serving_tables.
+metadata holds the registry, ops, ingest, eval, ft and reporting schemas. They only use portable
+types, so unit tests can run them on SQLite. The serving schema needs pgvector and full text search,
+so it only exists on Postgres and is built by serving_tables.
+Operational tables are both the hot data and the history. Retention blanks free text and deletes old
+rows in place, see retention.py.
 """
 
 from dataclasses import dataclass
@@ -33,8 +35,11 @@ from sqlalchemy.pool import StaticPool
 REGISTRY = "registry"
 SERVING = "serving"
 OPS = "ops"
+INGEST = "ingest"
+EVAL = "eval"
+FT = "ft"
 REPORTING = "reporting"
-SCHEMAS = (REGISTRY, SERVING, OPS, REPORTING)
+SCHEMAS = (REGISTRY, SERVING, OPS, INGEST, EVAL, FT, REPORTING)
 
 
 def utcnow() -> datetime:
@@ -92,8 +97,8 @@ ingestion_runs = Table(
     schema=REGISTRY,
 )
 
-corpus_versions = Table(
-    "corpus_versions",
+kb_versions = Table(
+    "kb_versions",
     metadata,
     Column("version_id", Integer, primary_key=True, autoincrement=False),
     Column("parent_version", Integer),
@@ -107,8 +112,8 @@ corpus_versions = Table(
     schema=REGISTRY,
 )
 
-corpus_aliases = Table(
-    "corpus_aliases",
+kb_aliases = Table(
+    "kb_aliases",
     metadata,
     Column("name", String, primary_key=True),
     Column("version_id", Integer, nullable=False),
@@ -136,9 +141,10 @@ interactions = Table(
     metadata,
     Column("request_id", String, primary_key=True),
     Column("pseudo_user", String, nullable=False, index=True),
+    Column("conversation_id", String, index=True),
     Column("question_enc", Text, nullable=False),
     Column("answer", Text),
-    Column("corpus_version", Integer),
+    Column("kb_version", Integer),
     Column("model_version", String),
     Column("prompt_version", String),
     Column("confidence", Float),
@@ -238,6 +244,195 @@ uploads = Table(
 )
 
 
+conversations = Table(
+    "conversations",
+    metadata,
+    Column("conversation_id", String, primary_key=True),
+    Column("pseudo_user", String, nullable=False, index=True),
+    Column("started_at", _ts(), nullable=False),
+    Column("last_active_at", _ts(), nullable=False, index=True),
+    schema=OPS,
+)
+
+request_facts = Table(
+    "request_facts",
+    metadata,
+    Column("request_id", String, primary_key=True),
+    Column("level", String, nullable=False),
+    Column("latency_ms", Float),
+    Column("e2e_ms", Float),
+    Column("tokens_in", Integer),
+    Column("tokens_out", Integer),
+    Column("guard_verdict", String),
+    Column("attachment_count", Integer, nullable=False, default=0),
+    Column("created_at", _ts(), nullable=False, index=True),
+    schema=OPS,
+)
+"""One row per request, written by the gateway. Blocked requests are included."""
+
+guard_events = Table(
+    "guard_events",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("request_id", String, index=True),
+    Column("detector", String, nullable=False),
+    Column("stage", String, nullable=False),
+    Column("category", String, nullable=False),
+    Column("score", Float, nullable=False),
+    Column("action", String, nullable=False),
+    Column("created_at", _ts(), nullable=False, index=True),
+    schema=OPS,
+)
+
+
+def _record_columns() -> list[Column]:
+    """Columns every ingest row carries, so the contract record can be rebuilt from the row."""
+    return [
+        Column("ingestion_run_id", String, primary_key=True),
+        Column("schema_version", String, nullable=False),
+        Column("producer", String, nullable=False),
+        Column("created_at", _ts(), nullable=False, index=True),
+    ]
+
+
+regions = Table(
+    "regions",
+    metadata,
+    *_record_columns(),
+    Column("region_id", String, primary_key=True),
+    Column("doc_version", String, nullable=False, index=True),
+    Column("page_no", Integer, nullable=False),
+    Column("kind", String, nullable=False),
+    Column("bbox", _json()),
+    Column("raw_text", Text),
+    Column("image_uri", String),
+    schema=INGEST,
+)
+
+extracted_regions = Table(
+    "extracted_regions",
+    metadata,
+    *_record_columns(),
+    Column("region_id", String, primary_key=True),
+    Column("kind", String, nullable=False),
+    Column("content", Text, nullable=False),
+    Column("extractor", _json(), nullable=False),
+    Column("confidence", Float, nullable=False),
+    schema=INGEST,
+)
+
+cleaned_pages = Table(
+    "cleaned_pages",
+    metadata,
+    *_record_columns(),
+    Column("doc_version", String, primary_key=True),
+    Column("page_no", Integer, primary_key=True),
+    Column("markdown", Text, nullable=False),
+    Column("region_ids", _json(), nullable=False),
+    Column("flags", _json(), nullable=False),
+    schema=INGEST,
+)
+"""The cleaned tier. It is kept, so a new embedding model rebuilds from here without new OCR."""
+
+staged_chunks = Table(
+    "chunks",
+    metadata,
+    *_record_columns(),
+    Column("chunk_id", String, primary_key=True),
+    Column("doc_version", String, nullable=False, index=True),
+    Column("embedding_model", String, nullable=False),
+    Column("chunker_version", String, nullable=False),
+    Column("page_start", Integer, nullable=False),
+    Column("page_end", Integer, nullable=False),
+    Column("section_path", _json(), nullable=False),
+    Column("text", Text, nullable=False),
+    Column("kinds", _json(), nullable=False),
+    Column("token_count", Integer, nullable=False),
+    Column("region_ids", _json(), nullable=False),
+    Column("embedding", _json(), nullable=False),
+    schema=INGEST,
+)
+"""The chunked tier. Chunk sets wait here for the gate, publish copies them into serving.chunks and
+retention deletes old staged rows."""
+
+ragas_scores = Table(
+    "ragas_scores",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("run_id", String, nullable=False, index=True),
+    Column("kb_version", Integer),
+    Column("model_version", String),
+    Column("prompt_version", String),
+    Column("dataset", String, nullable=False),
+    Column("item_id", String, nullable=False),
+    Column("metric", String, nullable=False),
+    Column("score", Float, nullable=False),
+    Column("judge_model", String),
+    Column("created_at", _ts(), nullable=False),
+    schema=EVAL,
+)
+
+test_cases = Table(
+    "test_cases",
+    metadata,
+    Column("case_id", String, primary_key=True),
+    Column("level", Integer, nullable=False),
+    Column("question", Text, nullable=False),
+    Column("source", String),
+    Column("reference_answer", Text),
+    Column("course_code", String),
+    Column("topic", String),
+    Column("created_at", _ts(), nullable=False),
+    schema=EVAL,
+)
+
+test_runs = Table(
+    "test_runs",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("run_id", String, nullable=False, index=True),
+    Column("case_id", String, ForeignKey(test_cases.c.case_id), nullable=False),
+    Column("response", Text),
+    Column("level_reached", String),
+    Column("confidence", Float),
+    Column("escalated", Boolean, nullable=False, default=False),
+    Column("ragas", _json(), nullable=False, default=dict),
+    Column("remediation", Text),
+    Column("created_at", _ts(), nullable=False),
+    schema=EVAL,
+)
+
+ft_datasets = Table(
+    "datasets",
+    metadata,
+    Column("dataset_version", String, primary_key=True),
+    Column("item_count", Integer, nullable=False),
+    Column("manifest_sha256", String(64), nullable=False),
+    Column("export_uri", String, nullable=False),
+    Column("status", String, nullable=False),
+    Column("approved_by", String),
+    Column("approved_at", _ts()),
+    Column("comment", Text),
+    Column("created_at", _ts(), nullable=False),
+    schema=FT,
+)
+"""A frozen fine tuning dataset. Its items are also written once as Parquet to export_uri."""
+
+ft_items = Table(
+    "items",
+    metadata,
+    Column("dataset_version", String, ForeignKey(ft_datasets.c.dataset_version), primary_key=True),
+    Column("item_id", String, primary_key=True),
+    Column("split", String, nullable=False),
+    Column("course_code", String),
+    Column("topic", String),
+    Column("question", Text, nullable=False),
+    Column("answer", Text, nullable=False),
+    Column("source", String, nullable=False),
+    schema=FT,
+)
+
+
 ragas_summary = Table(
     "ragas_summary",
     metadata,
@@ -245,7 +440,7 @@ ragas_summary = Table(
     Column("metric", String, primary_key=True),
     Column("ts", _ts(), nullable=False),
     Column("dataset", String, nullable=False),
-    Column("corpus_version", Integer),
+    Column("kb_version", Integer),
     Column("model_version", String),
     Column("prompt_version", String),
     Column("judge_model", String),

@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-eval"
-version = "1.0.0"
+version = "1.1.0"
 description = "RAGAs evaluation, golden set, quality gate checks and Appendix C test runs"
 requires-python = ">=3.12,<3.13"
 dependencies = [

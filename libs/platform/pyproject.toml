@@ -1,7 +1,7 @@
 [project]
 name = "chatbot-platform"
-version = "1.0.0"
-description = "Data platform: object store, registry, serving index, versioning, quality gate, lineage, retention"
+version = "1.1.0"
+description = "Data platform on Postgres and an object store: registry, serving index, ingest tiers, versioning, quality gate, lineage, retention, exports"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "chatbot-contracts",
@@ -11,7 +11,6 @@ dependencies = [
   "psycopg[binary]>=3.2",
   "pyarrow>=18",
   "pydantic-settings>=2.6",
-  "pyiceberg[pyarrow,sql-postgres,sql-sqlite]>=0.9",
   "sqlalchemy>=2.0.36",
 ]
 

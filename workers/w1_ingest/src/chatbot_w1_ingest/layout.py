@@ -2,7 +2,8 @@
 
 Purpose
 Split every page of a PDF, slide deck or scan into typed regions. The kinds are text, figure,
-scan, table, equation and code, see RegionKind. REGION_HANDLERS in chatbot_contracts.corpus says
+scan, table, equation and code, see RegionKind. REGION_HANDLERS in the knowledge_base module
+of chatbot_contracts says
 which worker extracts each kind.
 
 Input
@@ -26,7 +27,7 @@ Assert the page count, one region per page at least, and the kinds you expect.
 
 from dataclasses import dataclass
 
-from chatbot_contracts.corpus import Region
+from chatbot_contracts.knowledge_base import Region
 
 
 @dataclass(frozen=True)

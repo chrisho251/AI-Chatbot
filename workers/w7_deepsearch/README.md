@@ -2,9 +2,9 @@
 
 Worker-deepsearch from Appendix A.4. **Internal first, external second.**
 
-- **Internal (online):** hybrid search (pgvector dense and Postgres full-text) on the pinned corpus version, fused and reranked.
+- **Internal (online):** hybrid search (pgvector dense and Postgres full-text) on the pinned knowledge base version, fused and reranked.
 - **External (online):** searches allowlisted sources for exercises and answer keys when internal evidence is weak or the answer lands at L3. Results are labelled unvetted.
-- **Enrichment (offline):** weekly search by course topic. Finds are queued for SME triage and only enter the corpus through the quality gate.
+- **Enrichment (offline):** weekly search by course topic. Finds are queued for SME triage and only enter the knowledge base through the quality gate.
 
 **Owner:** Lane C.
 **Endpoints:** `POST /v1/retrieve` (`routes.RETRIEVE`) and `POST /v1/external` (`routes.EXTERNAL_SEARCH`).

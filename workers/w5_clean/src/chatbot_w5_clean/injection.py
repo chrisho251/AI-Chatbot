@@ -3,12 +3,13 @@
 Purpose
 Indirect prompt injection hides instructions inside sources or web pages. Offline, flagged regions
 are quarantined and counted in PageFlags.injection_hits. Online, flagged uploads and web pages are
-dropped. Every detection is also an obs.guard_events row with stage w5_ingest or w5_online,
+dropped. Every detection is also an ops.guard_events row with stage w5_ingest or w5_online,
 and a GUARD_EVENTS count from chatbot_common.metrics.
 
 What to build
 The prompt injection classifier named in TECH_STACK.md, run per paragraph with transformers on CPU,
-plus a few cheap patterns for phrases like ignore previous instructions.
+plus a few cheap patterns for phrases like ignore previous instructions. Online it runs inside the
+api process, so call it with asyncio.to_thread.
 
 How to test
 A paragraph with an embedded instruction is flagged, a normal statistics paragraph is not.

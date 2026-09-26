@@ -31,7 +31,7 @@ class ExternalSearchResult(OnlineRecord):
 
 
 class ExternalCandidate(Record):
-    """An external find waiting for SME triage before it may enter the corpus."""
+    """An external find waiting for SME triage before it may enter the knowledge base."""
 
     candidate_id: str
     url: str

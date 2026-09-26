@@ -19,9 +19,14 @@ class Attachment(OnlineRecord):
 
 
 class AskRequest(OnlineRecord):
-    """A pseudonymized question the gateway forwards to the orchestrator."""
+    """A pseudonymized question the gateway forwards to the orchestrator.
+
+    conversation_id groups the questions of one chat. The gateway creates it for a new chat, the
+    orchestrator uses it to read the earlier turns.
+    """
 
     pseudo_user: str
+    conversation_id: str
     question: str
     attachments: list[Attachment] = Field(default_factory=list)
 
@@ -53,7 +58,7 @@ class CleanResult(OnlineRecord):
 
 class EmbedRequest(OnlineRecord):
     texts: list[str]
-    corpus_version: int
+    kb_version: int
 
 
 class EmbedResult(OnlineRecord):
@@ -64,7 +69,7 @@ class EmbedResult(OnlineRecord):
 class RetrievalRequest(OnlineRecord):
     question: str
     query_vector: list[float]
-    corpus_version: int
+    kb_version: int
     k: int = Field(default=8, ge=1, le=50)
     filters: dict[str, str] = Field(default_factory=dict)
 
@@ -91,7 +96,7 @@ class RetrievalResult(OnlineRecord):
 
 
 class Citation(Model):
-    """Points at a corpus chunk, or at an external url for unvetted sources."""
+    """Points at a knowledge base chunk, or at an external url for unvetted sources."""
 
     chunk_id: str | None = None
     url: str | None = None
@@ -99,12 +104,22 @@ class Citation(Model):
     page: int | None = None
 
 
+class Turn(Model):
+    """One earlier question and its answer in the same conversation."""
+
+    question: str
+    answer: str
+
+
 class GenerationRequest(OnlineRecord):
+    """question is the standalone question. history holds the earlier turns, oldest first."""
+
     question: str
     contexts: list[RetrievedChunk]
     model_version: str
     prompt_version: str
     external_contexts: list[ExternalItem] = Field(default_factory=list)
+    history: list[Turn] = Field(default_factory=list)
 
 
 class GenerationResult(OnlineRecord):

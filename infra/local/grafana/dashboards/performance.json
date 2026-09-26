@@ -1,13 +1,13 @@
 {
   "uid": "chatbot-performance",
   "title": "Performance (Appendix B.1)",
-  "description": "Latency, response time and throughput of the answer path. The gateway records the clocks.",
+  "description": "Latency, response time and throughput of the answer path, and the time spent in each worker. The gateway records the clocks.",
   "tags": [
     "ai-chatbot"
   ],
   "editable": true,
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "30s",
   "time": {
     "from": "now-6h",
@@ -299,6 +299,39 @@
           },
           "expr": "sum by (service, status) (rate(chatbot_http_request_duration_seconds_count{status=~\"5..\"}[5m])) * 60",
           "legendFormat": "{{service}} {{status}}"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Time per worker, p95",
+      "description": "Time spent in each call to a worker or service, measured by ContractClient in the api process or over HTTP.",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le, worker) (rate(chatbot_worker_call_seconds_bucket[5m])))",
+          "legendFormat": "{{worker}}"
         }
       ]
     }

@@ -8,9 +8,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 RAW_BUCKET = "raw"
 UPLOADS_BUCKET = "uploads"
 EXTERNAL_BUCKET = "external"
-WAREHOUSE_BUCKET = "warehouse"
+EXPORTS_BUCKET = "exports"
 MLFLOW_BUCKET = "mlflow"
-BUCKETS = (RAW_BUCKET, UPLOADS_BUCKET, EXTERNAL_BUCKET, WAREHOUSE_BUCKET, MLFLOW_BUCKET)
+BUCKETS = (RAW_BUCKET, UPLOADS_BUCKET, EXTERNAL_BUCKET, EXPORTS_BUCKET, MLFLOW_BUCKET)
 
 
 class PlatformSettings(BaseSettings):
@@ -22,7 +22,6 @@ class PlatformSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PLATFORM_", env_file=".env", extra="ignore")
 
     database_url: str = "postgresql+psycopg://chatbot:chatbot@localhost:5432/chatbot"
-    catalog_uri: str | None = None
 
     object_store: Literal["local", "s3"] = "s3"
     local_root: str = "data/objects"
@@ -30,7 +29,6 @@ class PlatformSettings(BaseSettings):
     s3_access_key: str = "chatbot"
     s3_secret_key: SecretStr = SecretStr("chatbot-secret")
     s3_region: str = "us-east-1"
-    warehouse: str = f"s3://{WAREHOUSE_BUCKET}"
 
     embedding_dim: int = 1024
 
@@ -38,9 +36,6 @@ class PlatformSettings(BaseSettings):
     gate_max_duplicate_rate: float = 0.05
 
     retention_uploads_days: int = 30
-    retention_ops_days: int = 365
-    retention_history_days: int = 730
-
-    @property
-    def iceberg_catalog_uri(self) -> str:
-        return self.catalog_uri or self.database_url
+    retention_text_days: int = 365
+    retention_ops_days: int = 730
+    retention_staging_days: int = 90

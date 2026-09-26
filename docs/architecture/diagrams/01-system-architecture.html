@@ -5158,7 +5158,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <!-- Boundaries (behind everything) -->
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Edge · identity" x="240" y="140" width="460" height="114" rx="12" class="c-region" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Online query plane · FastAPI" x="0" y="270" width="1230" height="244" rx="12" class="c-region" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Online plane · one api process · FastAPI" x="0" y="270" width="1230" height="244" rx="12" class="c-region" stroke-width="1"/>
 
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="2" data-composition-frame-label="Shared services" x="480" y="530" width="750" height="114" rx="12" class="c-region" stroke-width="1"/>
 
@@ -5213,15 +5213,15 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="1120" y="86" class="t-muted" font-size="9" text-anchor="middle">expert answer API</text>
         </g>
 
-        <g id="node-identity" data-node-id="identity" data-node-label="Keycloak + Vault" tabindex="0" role="button" aria-label="Focus Keycloak + Vault, [infra/local], Edge · identity" aria-pressed="false" data-node-kind="security" data-node-sublabel="[infra/local]" data-node-tag="OIDC · keys" data-node-context="Edge · identity">
-          <title>Keycloak + Vault · [infra/local] · Edge · identity · OIDC · keys</title>
+        <g id="node-identity" data-node-id="identity" data-node-label="Keycloak + keys" tabindex="0" role="button" aria-label="Focus Keycloak + keys, [infra/local], Edge · identity" aria-pressed="false" data-node-kind="security" data-node-sublabel="[infra/local]" data-node-tag="OIDC · keys" data-node-context="Edge · identity">
+          <title>Keycloak + keys · [infra/local] · Edge · identity · OIDC · keys</title>
           <rect x="270" y="170" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="270" y="170" width="160" height="64" rx="6" class="c-security" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(276 176) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="350" y="200" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Keycloak + Vault</text>
+          <text data-node-label="" data-detail-anchor="" x="350" y="200" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Keycloak + keys</text>
         <text data-detail="context" x="350" y="216" class="t-muted" font-size="9" text-anchor="middle">[infra/local]</text>
         <text data-detail="fine" x="350" y="226" class="t-security" font-size="7" text-anchor="middle">OIDC · keys</text>
         </g>
@@ -5239,8 +5239,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="590" y="226" class="t-security" font-size="7" text-anchor="middle">guard · pseudonym</text>
         </g>
 
-        <g id="node-orchestrator" data-node-id="orchestrator" data-node-label="Query orchestrator" tabindex="0" role="button" aria-label="Focus Query orchestrator, [services/orchestrator], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[services/orchestrator]" data-node-tag="confidence" data-node-context="Online query plane · FastAPI">
-          <title>Query orchestrator · [services/orchestrator] · Online query plane · FastAPI · confidence</title>
+        <g id="node-orchestrator" data-node-id="orchestrator" data-node-label="Query orchestrator" tabindex="0" role="button" aria-label="Focus Query orchestrator, [services/orchestrator], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[services/orchestrator]" data-node-tag="confidence" data-node-context="Online plane · one api process · FastAPI">
+          <title>Query orchestrator · [services/orchestrator] · Online plane · one api process · FastAPI · confidence</title>
           <rect x="510" y="300" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="510" y="300" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(516 306) scale(0.6875)">
@@ -5251,8 +5251,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="590" y="356" class="t-backend" font-size="7" text-anchor="middle">confidence</text>
         </g>
 
-        <g id="node-escalation" data-node-id="escalation" data-node-label="Escalation" tabindex="0" role="button" aria-label="Focus Escalation, [services/escalation], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[services/escalation]" data-node-tag="expert path" data-node-context="Online query plane · FastAPI">
-          <title>Escalation · [services/escalation] · Online query plane · FastAPI · expert path</title>
+        <g id="node-escalation" data-node-id="escalation" data-node-label="Escalation" tabindex="0" role="button" aria-label="Focus Escalation, [services/escalation], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[services/escalation]" data-node-tag="expert path" data-node-context="Online plane · one api process · FastAPI">
+          <title>Escalation · [services/escalation] · Online plane · one api process · FastAPI · expert path</title>
           <rect x="1040" y="300" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="1040" y="300" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1046 306) scale(0.6875)">
@@ -5263,8 +5263,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="1120" y="356" class="t-backend" font-size="7" text-anchor="middle">expert path</text>
         </g>
 
-        <g id="node-inputs" data-node-id="inputs" data-node-label="W2 · W5 · W6" tabindex="0" role="button" aria-label="Focus W2 · W5 · W6, [workers/w2 w5 w6], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w2 w5 w6]" data-node-tag="vision · clean · embed" data-node-context="Online query plane · FastAPI">
-          <title>W2 · W5 · W6 · [workers/w2 w5 w6] · Online query plane · FastAPI · vision · clean · embed</title>
+        <g id="node-inputs" data-node-id="inputs" data-node-label="W2 · W5 · W6" tabindex="0" role="button" aria-label="Focus W2 · W5 · W6, [workers/w2 w5 w6], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w2 w5 w6]" data-node-tag="vision · clean · embed" data-node-context="Online plane · one api process · FastAPI">
+          <title>W2 · W5 · W6 · [workers/w2 w5 w6] · Online plane · one api process · FastAPI · vision · clean · embed</title>
           <rect x="30" y="430" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="30" y="430" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(36 436) scale(0.6875)">
@@ -5275,8 +5275,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="110" y="486" class="t-backend" font-size="7" text-anchor="middle">vision · clean · embed</text>
         </g>
 
-        <g id="node-w7" data-node-id="w7" data-node-label="W7 Deepsearch" tabindex="0" role="button" aria-label="Focus W7 Deepsearch, [workers/w7_deepsearch], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w7_deepsearch]" data-node-tag="internal first" data-node-context="Online query plane · FastAPI">
-          <title>W7 Deepsearch · [workers/w7_deepsearch] · Online query plane · FastAPI · internal first</title>
+        <g id="node-w7" data-node-id="w7" data-node-label="W7 Deepsearch" tabindex="0" role="button" aria-label="Focus W7 Deepsearch, [workers/w7_deepsearch], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w7_deepsearch]" data-node-tag="internal first" data-node-context="Online plane · one api process · FastAPI">
+          <title>W7 Deepsearch · [workers/w7_deepsearch] · Online plane · one api process · FastAPI · internal first</title>
           <rect x="270" y="430" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="270" y="430" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(276 436) scale(0.6875)">
@@ -5287,8 +5287,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="350" y="486" class="t-backend" font-size="7" text-anchor="middle">internal first</text>
         </g>
 
-        <g id="node-w8" data-node-id="w8" data-node-label="W8 Gen" tabindex="0" role="button" aria-label="Focus W8 Gen, [workers/w8_gen], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w8_gen]" data-node-tag="cited answer" data-node-context="Online query plane · FastAPI">
-          <title>W8 Gen · [workers/w8_gen] · Online query plane · FastAPI · cited answer</title>
+        <g id="node-w8" data-node-id="w8" data-node-label="W8 Gen" tabindex="0" role="button" aria-label="Focus W8 Gen, [workers/w8_gen], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w8_gen]" data-node-tag="cited answer" data-node-context="Online plane · one api process · FastAPI">
+          <title>W8 Gen · [workers/w8_gen] · Online plane · one api process · FastAPI · cited answer</title>
           <rect x="750" y="430" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="750" y="430" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(756 436) scale(0.6875)">
@@ -5299,8 +5299,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="830" y="486" class="t-backend" font-size="7" text-anchor="middle">cited answer</text>
         </g>
 
-        <g id="node-tools" data-node-id="tools" data-node-label="W3 Code · W4 Math" tabindex="0" role="button" aria-label="Focus W3 Code · W4 Math, [workers/w3 w4], Online query plane · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w3 w4]" data-node-tag="sandbox" data-node-context="Online query plane · FastAPI">
-          <title>W3 Code · W4 Math · [workers/w3 w4] · Online query plane · FastAPI · sandbox</title>
+        <g id="node-tools" data-node-id="tools" data-node-label="W3 Code · W4 Math" tabindex="0" role="button" aria-label="Focus W3 Code · W4 Math, [workers/w3 w4], Online plane · one api process · FastAPI" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w3 w4]" data-node-tag="sandbox" data-node-context="Online plane · one api process · FastAPI">
+          <title>W3 Code · W4 Math · [workers/w3 w4] · Online plane · one api process · FastAPI · sandbox</title>
           <rect x="1040" y="430" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="1040" y="430" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1046 436) scale(0.6875)">
@@ -5311,8 +5311,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="fine" x="1120" y="486" class="t-backend" font-size="7" text-anchor="middle">sandbox</text>
         </g>
 
-        <g id="node-web" data-node-id="web" data-node-label="Open web sources" tabindex="0" role="button" aria-label="Focus Open web sources, SearXNG · PubMed · OpenStax, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="SearXNG · PubMed · OpenStax" data-node-context="Architecture component">
-          <title>Open web sources · SearXNG · PubMed · OpenStax · Architecture component</title>
+        <g id="node-web" data-node-id="web" data-node-label="Open web sources" tabindex="0" role="button" aria-label="Focus Open web sources, SearXNG · open textbooks, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="SearXNG · open textbooks" data-node-context="Architecture component">
+          <title>Open web sources · SearXNG · open textbooks · Architecture component</title>
           <rect x="30" y="560" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="30" y="560" width="160" height="64" rx="6" class="c-external" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(36 566) scale(0.6875)">
@@ -5320,7 +5320,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="110" y="590" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Open web sources</text>
-        <text data-detail="context" x="110" y="606" class="t-muted" font-size="9" text-anchor="middle">SearXNG · PubMed · OpenStax</text>
+        <text data-detail="context" x="110" y="606" class="t-muted" font-size="9" text-anchor="middle">SearXNG · open textbooks</text>
         </g>
 
         <g id="node-platform" data-node-id="platform" data-node-label="Data platform" tabindex="0" role="button" aria-label="Focus Data platform, [libs/platform], Shared services" aria-pressed="false" data-node-kind="database" data-node-sublabel="[libs/platform]" data-node-tag="versioned vN" data-node-context="Shared services">
@@ -5372,14 +5372,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <text data-detail="context" x="110" y="736" class="t-muted" font-size="9" text-anchor="middle">admin CLI · sign-off</text>
         </g>
 
-        <g id="node-pipeline" data-node-id="pipeline" data-node-label="Corpus pipeline" tabindex="0" role="button" aria-label="Focus Corpus pipeline, [workers/w1 … w6], Offline plane · Dagster" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w1 … w6]" data-node-tag="Dagster" data-node-context="Offline plane · Dagster">
-          <title>Corpus pipeline · [workers/w1 … w6] · Offline plane · Dagster · Dagster</title>
+        <g id="node-pipeline" data-node-id="pipeline" data-node-label="Ingestion pipeline" tabindex="0" role="button" aria-label="Focus Ingestion pipeline, [workers/w1 … w6], Offline plane · Dagster" aria-pressed="false" data-node-kind="backend" data-node-sublabel="[workers/w1 … w6]" data-node-tag="Dagster" data-node-context="Offline plane · Dagster">
+          <title>Ingestion pipeline · [workers/w1 … w6] · Offline plane · Dagster · Dagster</title>
           <rect x="270" y="690" width="160" height="64" rx="6" class="c-mask"/>
           <rect x="270" y="690" width="160" height="64" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(276 696) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="350" y="720" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Corpus pipeline</text>
+          <text data-node-label="" data-detail-anchor="" x="350" y="720" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Ingestion pipeline</text>
         <text data-detail="context" x="350" y="736" class="t-muted" font-size="9" text-anchor="middle">[workers/w1 … w6]</text>
         <text data-detail="fine" x="350" y="746" class="t-backend" font-size="7" text-anchor="middle">Dagster</text>
         </g>
@@ -5489,9 +5489,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <text data-boundary-label="" x="248" y="163" class="t-cloud" font-size="9" font-weight="600">Edge · identity</text>
         </g>
 
-        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Online query plane · FastAPI">
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="Online plane · one api process · FastAPI">
           <rect data-graph-role="structural-frame-label-mask" x="4" y="280" width="161.2" height="16" rx="3" class="c-mask"/>
-          <text data-boundary-label="" x="8" y="293" class="t-cloud" font-size="9" font-weight="600">Online query plane · FastAPI</text>
+          <text data-boundary-label="" x="8" y="293" class="t-cloud" font-size="9" font-weight="600">Online plane · one api process · FastAPI</text>
         </g>
 
         <g data-graph-role="structural-frame-label" data-composition-frame-id="2" data-composition-frame-kind="region" data-composition-frame-label="Shared services">
@@ -5698,7 +5698,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           <h3>Internal first, web second</h3>
         </div>
         <ul>
-          <li>&bull; W7 searches the pinned corpus version, then the allowlisted web</li>
+          <li>&bull; W7 searches the pinned knowledge base, then the allowlisted web</li>
           <li>&bull; Web finds are labelled unvetted and queued for SME review</li>
         </ul>
       </div>
@@ -5706,11 +5706,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <div class="card">
         <div class="card-header">
           <div class="card-dot cyan"></div>
-          <h3>One image, two entrypoints</h3>
+          <h3>One package, two entrypoints</h3>
         </div>
         <ul>
           <li>&bull; W1 to W6 run offline as Dagster steps</li>
-          <li>&bull; W2 to W8 also serve answer-time APIs, W3 code runs in a sandbox</li>
+          <li>&bull; W2 to W8 run inside the api process, W3 code runs in a sandbox</li>
         </ul>
       </div>
 
@@ -5721,7 +5721,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </div>
         <ul>
           <li>&bull; SeaweedFS → S3 · Postgres → RDS · Keycloak → Cognito</li>
-          <li>&bull; Vault → KMS · Docker Compose → Terraform</li>
+          <li>&bull; Key file → KMS · Docker Compose → Terraform</li>
         </ul>
       </div>
     </div>

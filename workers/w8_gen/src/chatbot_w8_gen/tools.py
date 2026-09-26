@@ -7,7 +7,8 @@ and W3 to write and run R, Python or Excel code, then uses the verified results.
 What to build
 Detect a tool request from the model, OpenAI style tool calls when the server supports them or a
 fixed tag format otherwise. Send CalcCheck to routes.CALC or CodeTask to routes.CODE with
-ContractClient, return the result to the model and record a ToolCallRecord for each call.
+shared_client, which calls W4 and W3 in process inside the api service. Return the result to the
+model and record a ToolCallRecord for each call.
 Also record TOOL_CALLS and TOOL_CALL_DURATION from chatbot_common.metrics.
 
 How to test

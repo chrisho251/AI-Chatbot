@@ -295,7 +295,7 @@
     },
     {
       "kind": "region",
-      "label": "Online · answer a question · FastAPI",
+      "label": "Online · answer a question · api process",
       "wraps": [
         "w2n",
         "w5n",
@@ -366,7 +366,7 @@
       "id": "manifest",
       "from": "gate",
       "to": "index",
-      "label": "CorpusManifest",
+      "label": "KnowledgeBaseManifest",
       "variant": "emphasis",
       "fromSide": "right",
       "toSide": "top"
@@ -448,17 +448,17 @@
   "cards": [
     {
       "dot": "violet",
-      "title": "One image, two entrypoints",
+      "title": "One package, two entrypoints",
       "items": [
-        "W2 to W6 run offline as Dagster steps and online as APIs",
-        "Both roles share one image and the contracts package"
+        "W2 to W6 run offline as Dagster steps and online in the api",
+        "Both roles share one package and the same contracts"
       ]
     },
     {
       "dot": "emerald",
       "title": "One way into the index",
       "items": [
-        "Only the quality gate publishes a CorpusManifest",
+        "Only the quality gate publishes a KnowledgeBaseManifest",
         "W7 searches the pinned version first, the web second"
       ]
     },

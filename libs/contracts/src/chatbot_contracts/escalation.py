@@ -26,10 +26,18 @@ class EscalationTicket(OnlineRecord):
     answer: str | None = None
 
 
+class TicketQuery(OnlineRecord):
+    """Ask for the ticket of one request. The gateway sends it to serve a late expert answer."""
+
+
 class StreamEvent(OnlineRecord):
-    """One server sent event from the gateway to the student frontend."""
+    """One server sent event from the gateway to the student frontend.
+
+    The gateway sets conversation_id so the frontend can send it back with the next question.
+    """
 
     type: EventType
     text: str = ""
     citations: list[Citation] = Field(default_factory=list)
     level: ConfidenceLevel | None = None
+    conversation_id: str | None = None

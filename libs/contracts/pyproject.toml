@@ -1,6 +1,6 @@
 [project]
 name = "chatbot-contracts"
-version = "1.0.0"
+version = "1.1.0"
 description = "Typed records exchanged between every worker and service"
 requires-python = ">=3.12,<3.13"
 dependencies = ["pydantic>=2.9"]

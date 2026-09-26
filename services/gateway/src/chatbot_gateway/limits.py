@@ -6,7 +6,7 @@ when the number of requests in flight is at the limit the next one waits briefly
 
 What to build
 An in memory token bucket per pseudo user and a semaphore for requests in flight. Both limits come
-from GatewaySettings. One gateway process is enough for the target load.
+from GatewaySettings. One api process is enough for the target load.
 Keep IN_FLIGHT from chatbot_common.metrics equal to the number of admitted requests.
 
 How to test

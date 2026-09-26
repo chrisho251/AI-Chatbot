@@ -1,9 +1,9 @@
 """Offline entrypoint of W2 vision. The pipeline lane runs it once per ingestion run.
 
-Read the regions W2 handles for the run from corpus.regions, see REGION_HANDLERS.
+Read the regions W2 handles for the run from ingest.regions, see REGION_HANDLERS.
 Run OCR on scans and image tables, caption figures, and append one ExtractedRegion
-per region to corpus.extracted_regions.
-Dagster starts it in the w2 vision image with the run id and the document version.
+per region to ingest.extracted_regions.
+Dagster starts it in the app image with the run id and the document version.
 """
 
 import argparse

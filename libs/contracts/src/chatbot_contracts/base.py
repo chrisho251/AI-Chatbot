@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 
 
 class Model(BaseModel):

@@ -1,9 +1,9 @@
 # Tech stack
 
-**Version:** 1.0
-**Date:** 2026-09-25
+**Version:** 1.1
+**Date:** 2026-09-26
 **Read this when:** you set up a machine, add a dependency, or need to know what a component is for.
-**Not in this file:** how the components work together. That is in [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md).
+**Not in this file:** how the components work together. That is in [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md). What changed between versions is in [CHANGELOG.md](CHANGELOG.md).
 
 This file is the inventory of the project: every service, database, model, library and tool, what it is for, and whether it runs on any team member's machine.
 
@@ -20,7 +20,7 @@ The stack must run on any team member's machine, not only on one laptop.
 5. **CPU by default, GPU optional.** The default profiles run on CPU. A machine with an NVIDIA GPU adds the `gpu` profile. A Mac can run the LLM natively (llama.cpp or Ollama with Metal) and point `LLM_BASE_URL` at it.
 6. **No host-specific paths or scripts.** Paths are relative to the repo. Tasks run through `uv run poe <task>`, which is Python, not Bash or PowerShell. `.gitattributes` forces LF line endings so containers behave the same on Windows.
 7. **Every endpoint is configuration.** Model URLs, storage endpoints and credentials come from `.env` (template in `.env.example`). A component can move between a container, the host and AWS without code changes.
-8. **Tests do not need the full stack.** Unit tests use in-memory and local-filesystem adapters. Integration tests start only the `data` profile.
+8. **Tests do not need the full stack.** Unit tests use SQLite, in-memory and local-filesystem adapters. Integration tests start only the `data` profile.
 
 ---
 
@@ -39,46 +39,48 @@ The stack must run on any team member's machine, not only on one laptop.
 
 - **`data` profile only** (data platform work and tests): 4 GB RAM, 5 GB free disk.
 - **`data` + `core` + `cpu`** (full answer path on CPU): 16 GB RAM, 40 GB disk. The 4B model runs in 4-bit weights. Slow, but fine for development.
-- **All profiles on CPU:** 24 to 32 GB RAM, 60 GB disk. Adds Dagster, Docling, the observability stack and the R sandbox.
+- **All default profiles on CPU:** 16 to 24 GB RAM, 50 GB disk. Adds Dagster, Docling, the monitoring stack and the R sandbox. The optional `traces` and `finetune` profiles add about 2 GB.
 - **`gpu` profile** (target for 10 concurrent users): 32 GB+ RAM, 200 GB disk, one NVIDIA GPU with 24 GB VRAM (16 GB works with 4-bit weights).
 
 ---
 
 ## 3. Compose profiles
 
-Start only what the task needs, for example `docker compose --profile data up`.
+Start only what the task needs, for example `docker compose --profile data up`. `compose.yaml` defines 22 services. The default profiles on a CPU machine start 16 of them.
 
-- **`data`:** Postgres + pgvector, SeaweedFS, bucket and schema bootstrap. Enough for data platform work and integration tests.
-- **`core`:** Traefik, Keycloak, Vault, gateway, orchestrator, escalation, online workers W2 to W8. The answer path.
-- **`cpu`:** llama.cpp server, TEI (amd64). Models on any machine.
-- **`gpu`:** vLLM, TEI GPU, DCGM exporter. Needed for 10 concurrent users.
+- **`data`:** Postgres + pgvector, SeaweedFS. Enough for data platform work and integration tests.
+- **`core`:** Traefik, Keycloak, the api service. The answer path. The api service runs the gateway, orchestrator, escalation and the online roles of W2 to W8 in one process.
+- **`cpu`:** llama.cpp server, TEI for embeddings and reranking (amd64). Models on any machine.
+- **`gpu`:** vLLM, TEI, DCGM exporter. Needed for 10 concurrent users. Use it instead of `cpu`.
 - **`search`:** SearXNG. W7 external search.
 - **`sandbox`:** W3 code sandbox. W3 execution.
-- **`pipeline`:** Dagster webserver and daemon, MLflow. The offline plane.
-- **`obs`:** OTel Collector, Prometheus, Loki, Tempo, Grafana, cAdvisor. Monitoring for Appendix B.
+- **`pipeline`:** Dagster webserver and daemon. The offline plane. Worker steps run from the api image, so build it first with `docker compose --profile core build api`.
+- **`obs`:** Prometheus (90 days), Grafana, cAdvisor. Monitoring for Appendix B.
+- **`traces`** (optional): OTel Collector, Loki, Tempo. Traces and logs. Set `CHATBOT_OTEL_ENDPOINT` to use it.
+- **`finetune`** (optional, later phase): MLflow.
 - **`dev`:** Mailpit. Captures local email.
-- **`images`:** builds offline-only worker images (W1) that Dagster starts. Never run directly.
 
 Common combinations:
 - Data platform work: `data`
 - Answer path on CPU: `data core cpu search sandbox dev`
-- Load test: every profile, with `gpu` instead of `cpu`
+- Load test: `data core gpu search sandbox obs`
 
 ---
 
 ## 4. Databases and storage
 
-- **PostgreSQL 16 + pgvector:** serving index (dense vectors and full-text), corpus registry, lineage and hot operational tables. Also hosts the Iceberg SQL catalog and the Dagster, MLflow and Keycloak databases.
+- **PostgreSQL 16 + pgvector:** the only database of the platform. Serving index (dense vectors and full-text), registry and lineage, the cleaned and chunked ingest tiers, operational tables with their history, evaluation, fine-tuning datasets and the reporting views. Also hosts the Dagster and Keycloak databases.
   Image `pgvector/pgvector:pg16`. Runs on amd64 and arm64. PostgreSQL licence.
-- **SeaweedFS (S3 API):** local object store for the `raw`, `uploads`, `external`, `warehouse` (Iceberg data) and `mlflow` buckets. Replaces MinIO, see the note below.
+- **SeaweedFS (S3 API):** local object store for the `raw`, `uploads`, `external`, `exports` and `mlflow` buckets. Replaces MinIO, see the note below.
   Image `chrislusf/seaweedfs`. Runs on amd64 and arm64. Apache-2.0.
-- **Apache Iceberg (PyIceberg):** table format for the `cleaned` and `chunked` tiers and every history table. Snapshots give time travel and reproducible datasets.
-  Python package `pyiceberg`. Apache-2.0.
-- **DuckDB:** local analytics queries over Iceberg tables (quality gate checks, reports, lineage sweeps).
-  Python package `duckdb`. MIT.
-- **Local filesystem adapter:** zero-dependency object store and warehouse for unit tests and quick experiments. Part of `libs/platform`.
+- **Parquet exports (PyArrow):** write-once Parquet files in the `exports` bucket for datasets that must never change, such as fine-tuning dataset versions and evaluation runs. pandas or DuckDB read them for ad hoc analysis, Athena on AWS.
+  Python package `pyarrow`. Apache-2.0.
+- **SQLite:** replaces Postgres in unit tests, through the same SQLAlchemy tables. MLflow also keeps its small tracking store in SQLite inside its volume.
+- **Local filesystem adapter:** zero-dependency object store for unit tests and quick experiments. Part of `libs/platform`.
 
 **Why not MinIO.** MinIO stopped publishing community Docker images in October 2025, put the community edition in maintenance mode in December 2025 and archived the repository in 2026. New machines cannot pull a current image and there are no security fixes. The platform talks to storage only through the S3-compatible `ObjectStore` port, so SeaweedFS drops in locally and S3 stays the cloud target. Other options are Garage (AGPL-3.0) and RustFS (Apache-2.0, still alpha).
+
+**Why not Iceberg.** Version 1.0 kept the ingest tiers and history in Apache Iceberg tables next to Postgres. The data is small for that: a few courses of textbooks is well under 100,000 chunks, and 1,000 questions a day is about 365,000 rows a year. Iceberg would have meant a second copy of operational data and an hourly copy job, deletes that stay readable until snapshots are expired, file compaction, a separate query engine for reports, and publishing across two systems. Postgres handles this size easily, deletes student data at once, and publishes in one database. Reproducible datasets use write-once Parquet exports instead of snapshots. Iceberg is worth adding back only if a table passes about 100 million rows or the Institution wants the data in its own lake.
 
 ---
 
@@ -86,36 +88,38 @@ Common combinations:
 
 Every image below runs on amd64 and arm64 unless it says otherwise.
 
-- **Traefik** (profile `core`): TLS at the edge, routes HTTPS to the gateway and admin UIs.
+- **API service** (profile `core`): one FastAPI process for the whole online plane: gateway, orchestrator, escalation and the online roles of W2 to W8. The same image runs every offline worker step that Dagster starts.
+  Built from `python:3.12-slim` with `infra/docker/python.Dockerfile` and the `chatbot-api` package. Project code.
+- **Traefik** (profile `core`): TLS at the edge. Routes only the public routes to the api service.
   Image `traefik`. MIT.
-- **Keycloak** (profile `core`): OIDC identity provider and RBAC roles `student`, `sme`, `expert`, `data_engineer`, `ml_engineer`, `ops`, `auditor`.
+- **Keycloak** (profile `core`): OIDC identity provider and RBAC roles `student`, `sme`, `expert`, `data_engineer`, `ml_engineer`, `ops`, `auditor`. In production the gateway can validate the tokens of the Institution's own identity provider instead.
   Image `quay.io/keycloak/keycloak`. Apache-2.0.
-- **HashiCorp Vault** (profile `core`): pseudonymization keys (HMAC), Transit envelope encryption for student free text, secrets.
-  Image `hashicorp/vault`. BUSL-1.1. OpenBao (MPL-2.0) is an API-compatible alternative.
-- **SearXNG** (profile `search`): self-hosted meta search engine that W7 uses for external web search. No API key, no per-query cost.
+- **SearXNG** (profile `search`): self-hosted meta search engine that W7 uses for external web search, restricted to the allowlist. No API key, no per-query cost.
   Image `searxng/searxng`. AGPL-3.0.
 - **W3 code sandbox** (profile `sandbox`): isolated runner for R, Python and Excel formula checks. No network, with CPU, memory and time limits.
   Built from `rocker/r-ver` plus Python. Project code. R itself is GPL-2/3.
-- **Dagster webserver and daemon** (profile `pipeline`): runs the offline plane. Sensors for new files, schedules for enrichment, RAGAs, retention and metric snapshots, jobs for fine-tuning.
+- **Dagster webserver and daemon** (profile `pipeline`): runs the offline plane. Sensors for new files, schedules for enrichment, RAGAs and retention, jobs for fine-tuning.
   Built from `python:3.12-slim`. Apache-2.0.
-- **MLflow** (profile `pipeline`): model registry and experiment tracking for fine-tuned adapters. Artifacts go to the object store.
-  Built from `python:3.12-slim`. Apache-2.0.
+- **MLflow** (profile `finetune`, optional): model registry and experiment tracking for fine-tuned adapters. Tracking store in SQLite in its volume, artifacts in the volume locally and in S3 on AWS.
+  Image `ghcr.io/mlflow/mlflow`. Apache-2.0.
 - **Mailpit** (profile `dev`): captures outgoing email locally (expert notifications, gate reports).
   Image `axllent/mailpit`. MIT.
-- **OpenTelemetry Collector** (profile `obs`): receives traces, metrics and logs from every service.
-  Image `otel/opentelemetry-collector-contrib`. Apache-2.0.
-- **Prometheus** (profile `obs`): real-time metrics store and alert rules.
+- **Prometheus** (profile `obs`): metrics store and alert rules. Keeps 90 days, enough for a milestone review.
   Image `prom/prometheus`. Apache-2.0.
-- **Loki** (profile `obs`): log store.
-  Image `grafana/loki`. AGPL-3.0.
-- **Tempo** (profile `obs`): trace store.
-  Image `grafana/tempo`. AGPL-3.0.
 - **Grafana** (profile `obs`): the monitoring dashboards for Appendix B and C.2, over Prometheus and the Postgres `reporting` schema. Dashboards are JSON files in the repo, see [MONITORING.md](MONITORING.md).
   Image `grafana/grafana`. AGPL-3.0.
-- **cAdvisor** (profile `obs`): CPU and memory per container, for every worker and model server. Gives partial data under Docker Desktop.
+- **cAdvisor** (profile `obs`): CPU and memory per container, for the api service, the sandbox and every model server. Gives partial data under Docker Desktop.
   Image `gcr.io/cadvisor/cadvisor`. Apache-2.0.
+- **OpenTelemetry Collector** (profile `traces`, optional): receives traces and logs from the api service.
+  Image `otel/opentelemetry-collector-contrib`. Apache-2.0.
+- **Loki** (profile `traces`, optional): log store.
+  Image `grafana/loki`. AGPL-3.0.
+- **Tempo** (profile `traces`, optional): trace store.
+  Image `grafana/tempo`. AGPL-3.0.
 - **NVIDIA DCGM exporter** (profile `gpu`): GPU memory and utilization.
   Image `nvcr.io/nvidia/k8s/dcgm-exporter`. amd64 with NVIDIA only. Apache-2.0.
+
+**Keys without Vault.** Version 1.0 ran HashiCorp Vault for one HMAC key and text encryption. The `KeyService` port in `libs/common` now reads a local key file mounted read-only into the api container, and uses KMS on AWS. One stateful service and one BUSL licence fewer.
 
 ---
 
@@ -127,7 +131,7 @@ All inference is self-hosted with open-weight models. There is no paid inference
   Image `ghcr.io/ggml-org/llama.cpp:server`. amd64 and arm64. MIT.
 - **vLLM** (profile `gpu`): LLM, LoRA adapters, judge and vision-language model on GPU. Continuous batching handles 10+ concurrent streams.
   Image `vllm/vllm-openai`. amd64 with NVIDIA only. Apache-2.0.
-- **Text Embeddings Inference, TEI** (profiles `cpu` and `gpu`): embeddings and reranking over HTTP.
+- **Text Embeddings Inference, TEI** (profiles `cpu` and `gpu`, on CPU in both): embeddings and reranking over HTTP.
   Image `ghcr.io/huggingface/text-embeddings-inference`. amd64 only, no prebuilt arm64 image. Apache-2.0.
 - **In-process adapter (sentence-transformers):** portable fallback for embeddings and reranking inside W6 and W7. Used on arm64 machines and in tests.
   Python package. Apache-2.0.
@@ -138,15 +142,15 @@ All inference is self-hosted with open-weight models. There is no paid inference
 
 Pin exact revisions in `.env`. Review newer open-weight releases at M1 and record any change here.
 
-- **Generation and fine-tuning base:** Qwen3 4B-class instruct. Used by W8 and by W3 for code generation. Apache-2.0.
-- **RAGAs judge:** the same family at 8B, run off-peak. Used by the eval runner. Apache-2.0.
+- **Generation and fine-tuning base:** Qwen3 instruct, 4B class by default. At M1, compare the 4B, 8B and about 14B sizes on the golden set (faithfulness, citation accuracy, time to first token at 10 users) and keep the smallest size that meets the targets. On the 24 GB GPU, 8B and 14B run in 4-bit weights. Used by W8 and by W3 for code generation. Apache-2.0.
+- **RAGAs judge:** an open-weight model from another family than the generator, Apache-2.0 or MIT licensed, picked at M1. A judge from the same family tends to favour its own answers. Run off-peak. Used by the eval runner.
 - **Embeddings:** BAAI bge-m3. Used by W6. MIT.
 - **Reranker:** BAAI bge-reranker-v2-m3. Used by W7. Apache-2.0.
-- **Vision-language** (student photos, handwritten formulas, charts): IBM Granite Vision class, with SmolVLM class as the lighter option. Used by W2. Apache-2.0.
+- **Vision-language** (student photos, handwritten formulas, charts): IBM Granite Vision class, with SmolVLM class as the lighter option. Used by W2. Apache-2.0. At M1, also try one vision-language model of the generator family for both answers and photos, which saves a model server.
 - **Layout, OCR, formula and code extraction for PDFs:** Docling with its layout and code/formula models. Used by W1, W2, W4. MIT.
-- **Prompt-injection guard:** ProtectAI deberta-v3-base prompt-injection v2. Used by the gateway and W5. Apache-2.0.
-- **Misuse and safety guard:** IBM Granite Guardian. Used by the gateway. Apache-2.0.
-- **Groundedness for confidence:** NLI cross-encoder, DeBERTa-v3 MNLI class. Used by the orchestrator. Apache-2.0.
+- **Prompt-injection guard:** ProtectAI deberta-v3-base prompt-injection v2. Used by the gateway and W5, in a worker thread of the api process. Apache-2.0.
+- **Misuse and safety guard:** IBM Granite Guardian, the smallest variant that meets the Appendix B.2 targets, because it runs on every question. Used by the gateway, next to input preparation so it does not add to the latency. Apache-2.0.
+- **Groundedness for confidence:** NLI cross-encoder, DeBERTa-v3 MNLI class. Used by the orchestrator, in a worker thread. Apache-2.0.
 - **PII detection:** Microsoft Presidio with a spaCy English model. Used by W5. MIT.
 
 ---
@@ -155,10 +159,7 @@ Pin exact revisions in `.env`. Review newer open-weight releases at M1 and recor
 
 These are free and need no paid API key. W7 uses them only after internal retrieval is not enough, and the offline enrichment job uses them on a schedule. Queries leave PII-stripped. Only allowlisted domains are fetched, `robots.txt` is respected and every result records its licence.
 
-- **SearXNG** (self-hosted): general web search restricted to the allowlist. No limit of its own, but upstream engines may throttle.
-- **NCBI E-utilities (PubMed):** biomedical literature over REST. 3 requests per second without a key, 10 with a free key.
-- **Europe PMC REST API:** open-access full text. Fair use.
-- **MedlinePlus web service:** consumer health topics. Fair use.
+- **SearXNG** (self-hosted): web search restricted to the allowlist with site filters. No limit of its own, but upstream engines may throttle, so W7 has a timeout and moves on to the expert.
 - **OpenStax and LibreTexts** (through SearXNG with a site filter): open textbooks with exercises and answer keys. Licence per page, usually CC BY or CC BY-NC-SA.
 
 ---
@@ -166,22 +167,23 @@ These are free and need no paid API key. W7 uses them only after internal retrie
 ## 8. Python libraries by package
 
 - **`libs/contracts`:** Pydantic v2. Typed, versioned records between workers, with JSON Schema export.
-- **`libs/platform`:** PyIceberg, PyArrow, SQLAlchemy 2, psycopg 3, Alembic, pgvector-python, boto3, pydantic-settings. Data platform ports and adapters, migrations, versioning, lineage. DuckDB joins when the analytics query engine is built.
-- **`libs/common`:** FastAPI, Uvicorn, httpx, pydantic-settings, prometheus-client. App factory with a metrics route, the metric catalogue, contract client, test fakes, LLM and TEI clients. Lane D adds the OpenTelemetry SDK for tracing.
-- **`services/gateway`:** FastAPI, Uvicorn, sse-starlette, Authlib, hvac, transformers. Auth, RBAC, rate limit, pseudonymization, guard, SSE streaming, uploads.
-- **`services/orchestrator`:** FastAPI, httpx, sentence-transformers (NLI). Request pipeline, citation validation, confidence and level routing.
+- **`libs/platform`:** SQLAlchemy 2, psycopg 3, Alembic, pgvector-python, boto3, PyArrow, pydantic-settings. Data platform ports and adapters, migrations, ingest tiers, versioning, lineage, retention, Parquet exports.
+- **`libs/common`:** FastAPI, Uvicorn, httpx, pydantic-settings, prometheus-client. App factory with a metrics route, the metric catalogue, contract client with local handlers, the `KeyService` port, test fakes, LLM and TEI clients. The key adapter adds `cryptography`, and Lane D adds the OpenTelemetry SDK for tracing.
+- **`services/api`:** the gateway, orchestrator, escalation and every worker package. Builds the one app image.
+- **`services/gateway`:** FastAPI, Uvicorn, python-multipart, Authlib, transformers. Auth, RBAC, rate limit, pseudonymization, guard, SSE streaming, uploads, conversation ids.
+- **`services/orchestrator`:** FastAPI, httpx, sentence-transformers (NLI). Request pipeline, conversation history, citation validation, confidence and level routing.
 - **`services/escalation`:** FastAPI, SQLAlchemy. Tickets, on-duty rota, notifications, expert answer API.
 - **`workers/w1_ingest`:** Docling. Layout analysis, region split, document version registration.
 - **`workers/w2_vision`:** Docling OCR and an OpenAI-compatible client for the vision-language model. OCR, captions, reading student photos.
 - **`workers/w3_code`:** openpyxl, formulas, numpy, pandas, scipy, statsmodels, and R inside the sandbox. Generate, run and check R, Python and Excel solutions.
-- **`workers/w4_math`:** SymPy, SciPy, statsmodels. Normalize LaTeX, compute and verify statistics and dosages.
+- **`workers/w4_math`:** SymPy, SciPy, statsmodels. Normalize LaTeX, compute and verify statistics.
 - **`workers/w5_clean`:** Presidio, datasketch (MinHash), ftfy, trafilatura. Normalize, dedupe, PII scrub, injection scan, clean web pages.
 - **`workers/w6_embed`:** sentence-transformers or a TEI client, and a transformers tokenizer. Structure-aware chunking with token counts, embeddings for content and queries.
 - **`workers/w7_deepsearch`:** httpx, trafilatura, SQLAlchemy. Internal hybrid search and rerank, external search fallback, enrichment.
-- **`workers/w8_gen`:** an OpenAI-compatible client, Jinja2. Grounded prompts, streaming, tool calls to W3 and W4, citations.
-- **`pipelines`:** Dagster, dagster-docker, dagster-postgres, dagster-webserver. Sensors, schedules and jobs. Each worker step runs in its own image through Dagster Pipes.
+- **`workers/w8_gen`:** an OpenAI-compatible client, Jinja2. Grounded prompts with conversation history, streaming, tool calls to W3 and W4, citations.
+- **`pipelines`:** Dagster, dagster-docker, dagster-postgres, dagster-webserver. Sensors, schedules and jobs. Each worker step runs in its own container from the app image through Dagster Pipes.
 - **`ml/eval`:** ragas, datasets. RAGAs on the golden set and sampled live traffic.
-- **`ml/finetune`:** transformers, PEFT, TRL, bitsandbytes, MLflow. Dataset build, QLoRA training, registry. Training needs an NVIDIA GPU.
+- **`ml/finetune`:** transformers, PEFT, TRL, bitsandbytes, MLflow. Dataset build, QLoRA training, registry. Training needs an NVIDIA GPU. Optional, later phase.
 
 ---
 
@@ -194,6 +196,7 @@ These are free and need no paid API key. W7 uses them only after internal retrie
 - **moto:** fakes the S3 API in unit tests of the object store. Apache-2.0.
 - **poethepoet:** cross-platform task runner, for example `uv run poe test` or `uv run poe up`. MIT.
 - **pre-commit:** runs Ruff, mypy and file checks before each commit. MIT.
+- **Locust:** load test for the 10 concurrent user target, in `tests/load`. Run with `uvx locust`, so it stays out of the lock file. MIT.
 
 ---
 
@@ -201,21 +204,20 @@ These are free and need no paid API key. W7 uses them only after internal retrie
 
 Each line reads: concern, then local choice → AWS choice, then the port (interface) the code talks to.
 
-- **Object store:** SeaweedFS → S3. Port `ObjectStore`.
-- **Table catalog:** Iceberg SQL catalog in Postgres → AWS Glue Data Catalog. Port `TableCatalog`.
-- **Analytics queries:** DuckDB → Athena. Port `QueryEngine`.
-- **Serving index and lineage:** PostgreSQL + pgvector → RDS PostgreSQL + pgvector. Ports `VectorIndex` and `LineageStore`.
+- **Object store and exports:** SeaweedFS → S3. Port `ObjectStore`.
+- **Database (serving index, registry, lineage, ingest tiers, ops, eval):** PostgreSQL + pgvector → RDS PostgreSQL + pgvector. Ports `VectorIndex` and `LineageStore`, and SQLAlchemy.
+- **Online plane:** the api container → the same container on an EC2 host, or an ECS service. Code: `chatbot_api.serve`.
 - **Orchestration:** Dagster OSS → Dagster on ECS. Code: Dagster definitions.
 - **LLM, VLM, embeddings:** llama.cpp and TEI → vLLM and TEI on an EC2 GPU host. Ports: OpenAI-compatible HTTP, `Embedder`, `Reranker`.
 - **External search:** SearXNG container → SearXNG on ECS. Port `WebSearch`.
 - **Code sandbox:** sandbox container on an internal network → ECS task with no egress. Port `CodeRunner`.
-- **Identity:** Keycloak → Cognito. Protocol OIDC.
-- **Keys and secrets:** Vault → KMS + Secrets Manager. Ports `KeyService` and `Secrets`.
+- **Identity:** Keycloak → Cognito, or the Institution's identity provider. Protocol OIDC.
+- **Keys and secrets:** key file → KMS + Secrets Manager. Ports `KeyService` and `Secrets`.
 - **TLS:** Traefik + mkcert → ALB + ACM. No port needed.
 - **Email:** Mailpit → SES. Port `Notifier`.
-- **Observability:** OTel Collector, Prometheus, Loki, Tempo, Grafana → CloudWatch or Amazon Managed Prometheus and Grafana. Protocol OpenTelemetry.
-- **Model registry:** MLflow + object store → MLflow + S3. MLflow API.
-- **Container images:** local build → ECR.
+- **Observability:** Prometheus, Grafana, and optionally OTel Collector, Loki, Tempo → CloudWatch or Amazon Managed Prometheus and Grafana. Protocol OpenTelemetry.
+- **Model registry (optional phase):** MLflow + volume → MLflow + S3. MLflow API.
+- **Container images:** local build → ECR. One app image plus the sandbox image.
 - **Infrastructure as code:** `compose.yaml` with profiles → Terraform modules (OpenTofu compatible).
 
 GPU instances are not free-tier eligible. See section 11 for cost and the low-cost plan for the test phase.
@@ -228,9 +230,9 @@ Checked on 2026-09-25. Prices change, so check the provider pages before you rel
 
 ### Development on team machines: no cost
 
-- **Software.** Everything in this file is free to use. AGPL components (Grafana, Loki, Tempo, SearXNG) only create obligations when you modify them and offer them over a network. We run the published images unchanged. BUSL components (Vault, Terraform) are free for this use. OpenBao and OpenTofu are drop-in open source alternatives.
+- **Software.** Everything in this file is free to use. AGPL components (Grafana, Loki, Tempo, SearXNG) only create obligations when you modify them and offer them over a network. We run the published images unchanged. The BUSL component (Terraform) is free for this use. OpenTofu is a drop-in open source alternative.
 - **Models.** Every default model is open weight under Apache-2.0 or MIT. Downloads from Hugging Face are free. A free Hugging Face token avoids anonymous rate limits.
-- **External sources.** SearXNG, PubMed, Europe PMC and MedlinePlus are free. A free NCBI key raises the PubMed limit from 3 to 10 requests per second.
+- **External sources.** SearXNG, OpenStax and LibreTexts are free.
 - **Docker Desktop.** Free for personal use, students, education and small businesses. On computers owned by an organization with more than 250 employees it needs a paid subscription. Rancher Desktop or Docker Engine in WSL2 are free alternatives.
 - **Docker Hub.** No cost. Anonymous pulls are rate limited, so log in with a free account if a pull is refused.
 - **Fine-tuning.** QLoRA on a 4B model needs an NVIDIA GPU. Kaggle notebooks and Google Colab give free GPU time (T4 16 GB), which is enough for the first checkpoints.

@@ -1,7 +1,9 @@
 """Keep lanes independent by checking which workspace packages may depend on which.
 
 Services, workers, pipelines and ml packages may only depend on the shared libraries.
-They talk to each other over HTTP with contracts, never through imports.
+They talk to each other through contracts, never through imports.
+The api package is the one exception. It composes the services and workers into one process, so it
+may depend on all of them, and no package may depend on it.
 """
 
 import sys
@@ -10,6 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SHARED = {"chatbot-contracts", "chatbot-common", "chatbot-platform"}
+COMPOSER = "chatbot-api"
+NOT_COMPOSED = {"chatbot-pipelines", "chatbot-eval", "chatbot-finetune", COMPOSER}
 ALLOWED = {
     "chatbot-contracts": set(),
     "chatbot-common": {"chatbot-contracts"},
@@ -36,6 +40,8 @@ def violations(graph: dict[str, set[str]]) -> list[str]:
     problems = []
     for package, internal in sorted(graph.items()):
         allowed = ALLOWED.get(package, SHARED)
+        if package == COMPOSER:
+            allowed = set(graph) - NOT_COMPOSED
         for dependency in sorted(internal - allowed):
             problems.append(f"{package} must not depend on {dependency}")
     return problems

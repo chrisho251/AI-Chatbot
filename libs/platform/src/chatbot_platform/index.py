@@ -1,7 +1,8 @@
 """Serving index port and an in memory adapter for tests.
 
-Chunk content is stored once. Validity intervals say which corpus versions see a chunk, so a query
-at version v only sees chunks with valid_from_version at or below v and valid_to_version above v.
+Chunk content is stored once. Validity intervals say which knowledge base versions see a chunk,
+so a query at version v only sees chunks with valid_from_version at or below v and valid_to_version
+above v.
 A chunk can have several intervals when a rollback is followed by a new publish.
 """
 
@@ -10,7 +11,7 @@ import re
 from collections.abc import Collection, Sequence
 from typing import Protocol
 
-from chatbot_contracts.corpus import ChunkSet
+from chatbot_contracts.knowledge_base import ChunkSet
 from chatbot_platform.models import IndexHit, StoredChunk
 
 

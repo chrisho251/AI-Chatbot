@@ -15,9 +15,15 @@ class ServiceSettings(BaseSettings):
     embed_base_url: str = "http://localhost:8081"
     rerank_base_url: str = "http://localhost:8082"
     request_timeout_s: float = 60.0
+    key_file: str = "infra/local/keys/keys.json"
+    otel_endpoint: str = ""
 
 
 def service_url(service: str) -> str:
-    """Base url of another service, from CHATBOT_<SERVICE>_URL or the compose host name."""
+    """Base url of a component that runs in its own container.
+
+    Only used for endpoints without a local handler. Set CHATBOT_<SERVICE>_URL to point at it,
+    otherwise the compose host name of the service is used.
+    """
     override = os.environ.get(f"CHATBOT_{service.upper()}_URL")
     return override or f"http://{service.replace('_', '-')}:8000"

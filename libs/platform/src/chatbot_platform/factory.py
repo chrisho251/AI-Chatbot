@@ -1,14 +1,11 @@
 """Build the platform from settings. This is the only place that chooses adapters."""
 
-from dataclasses import dataclass, field
-from functools import cached_property
+from dataclasses import dataclass
 from pathlib import Path
 
-from pyiceberg.catalog import Catalog
 from sqlalchemy import Engine, create_engine
 
 from chatbot_platform.index import ServingIndex
-from chatbot_platform.lake import open_catalog
 from chatbot_platform.pg_index import PgServingIndex
 from chatbot_platform.registry import Registry
 from chatbot_platform.settings import PlatformSettings
@@ -22,12 +19,6 @@ class Platform:
     store: ObjectStore
     index: ServingIndex
     registry: Registry
-    _catalog: Catalog | None = field(default=None, repr=False)
-
-    @cached_property
-    def catalog(self) -> Catalog:
-        """Opened on first use, so services that never touch the lake do not need it."""
-        return self._catalog or open_catalog(self.settings)
 
 
 def build_store(settings: PlatformSettings) -> ObjectStore:

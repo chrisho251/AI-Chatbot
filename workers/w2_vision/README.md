@@ -1,17 +1,17 @@
 # W2 vision
 
-Worker-vision from Appendix A.4. Two roles in one image:
+Worker-vision from Appendix A.4. Two roles in one package:
 
 - **Offline (ingest):** OCR for scans and image tables, captions and alt text for figures.
 - **Online (answer time):** reads a student photo of a problem set, chart or handwritten formula.
 
 **Owner:** Lane B.
-**Offline reads:** `corpus.regions` of kinds figure, scan and table. **Writes:** `corpus.extracted_regions`.
+**Offline reads:** `ingest.regions` of kinds figure, scan and table. **Writes:** `ingest.extracted_regions`.
 **Online endpoint:** `POST /v1/vision`, `VisionRequest` to `VisionResult` (see `chatbot_contracts.routes.VISION`).
 
 ## Files
 
-- `serve.py`: FastAPI app, already wired to the contract. Run with `uvicorn chatbot_w2_vision.serve:app`.
+- `serve.py`: `HANDLERS`, called in process by the api service, and `app`, the same handler over HTTP. Run it alone with `uvicorn chatbot_w2_vision.serve:app`.
 - `job.py`: offline entrypoint.
 - `ocr.py`, `captions.py`: offline extraction.
 - `photo.py`: online photo reading.

@@ -42,7 +42,7 @@
     {
       "id": "identity",
       "type": "security",
-      "label": "Keycloak + Vault",
+      "label": "Keycloak + keys",
       "sublabel": "[infra/local]",
       "pos": [
         270,
@@ -163,7 +163,7 @@
       "id": "web",
       "type": "external",
       "label": "Open web sources",
-      "sublabel": "SearXNG · PubMed · OpenStax",
+      "sublabel": "SearXNG · open textbooks",
       "pos": [
         30,
         560
@@ -233,7 +233,7 @@
     {
       "id": "pipeline",
       "type": "backend",
-      "label": "Corpus pipeline",
+      "label": "Ingestion pipeline",
       "sublabel": "[workers/w1 … w6]",
       "pos": [
         270,
@@ -287,7 +287,7 @@
     },
     {
       "kind": "region",
-      "label": "Online query plane · FastAPI",
+      "label": "Online plane · one api process · FastAPI",
       "wraps": [
         "orchestrator",
         "escalation",
@@ -450,16 +450,16 @@
       "dot": "emerald",
       "title": "Internal first, web second",
       "items": [
-        "W7 searches the pinned corpus version, then the allowlisted web",
+        "W7 searches the pinned knowledge base, then the allowlisted web",
         "Web finds are labelled unvetted and queued for SME review"
       ]
     },
     {
       "dot": "cyan",
-      "title": "One image, two entrypoints",
+      "title": "One package, two entrypoints",
       "items": [
         "W1 to W6 run offline as Dagster steps",
-        "W2 to W8 also serve answer-time APIs, W3 code runs in a sandbox"
+        "W2 to W8 run inside the api process, W3 code runs in a sandbox"
       ]
     },
     {
@@ -467,7 +467,7 @@
       "title": "Local now, AWS later",
       "items": [
         "SeaweedFS → S3 · Postgres → RDS · Keycloak → Cognito",
-        "Vault → KMS · Docker Compose → Terraform"
+        "Key file → KMS · Docker Compose → Terraform"
       ]
     }
   ]

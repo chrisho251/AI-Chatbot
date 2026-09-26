@@ -1,6 +1,6 @@
 {
   "additionalProperties": false,
-  "description": "Ask W4 to compute or verify a value.\n\noperation names an entry of the W4 catalogue, for example t_test or dosage.",
+  "description": "Ask W4 to compute or verify a value.\n\noperation names an entry of the W4 catalogue, for example t_test_one_sample.",
   "properties": {
     "expression": {
       "anyOf": [
@@ -28,7 +28,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0",
+      "default": "1.1",
       "title": "Schema Version",
       "type": "string"
     },

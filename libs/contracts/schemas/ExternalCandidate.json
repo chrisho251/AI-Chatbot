@@ -19,7 +19,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "An external find waiting for SME triage before it may enter the corpus.",
+  "description": "An external find waiting for SME triage before it may enter the knowledge base.",
   "properties": {
     "candidate_id": {
       "title": "Candidate Id",
@@ -58,7 +58,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0",
+      "default": "1.1",
       "title": "Schema Version",
       "type": "string"
     },

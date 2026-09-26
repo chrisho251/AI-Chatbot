@@ -6,9 +6,10 @@ with instructions, so injected text in a source cannot act as an instruction.
 
 What to build
 A Jinja2 template per prompt version. Number the contexts so the model cites them as [1], [2] and
-so on. External contexts are listed after corpus contexts under an unvetted external source label.
-Tell the model to answer in the style of a tutor for Health Science students and to say when the
-sources are not enough. Bump PROMPT_VERSION on any change, every answer logs it.
+so on. External contexts are listed after knowledge base contexts under an unvetted external
+source label. The earlier turns of the conversation come before the question, as user and
+assistant messages. Tell the model to answer in the style of a tutor for students and to say
+when the sources are not enough. Bump PROMPT_VERSION on any change, every answer logs it.
 
 How to test
 Snapshot the rendered messages for samples.sample_generation_request.

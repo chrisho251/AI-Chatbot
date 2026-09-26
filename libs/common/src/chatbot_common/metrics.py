@@ -2,8 +2,9 @@
 
 Define a metric here before using it in code or in a dashboard. scripts/check_dashboards.py fails
 when a dashboard uses a chatbot metric that this module does not define.
-create_app records HTTP_DURATION for every route. The other metrics are recorded by the component
-named in their help text, see docs/MONITORING.md for who records what.
+create_app records HTTP_DURATION for every route and ContractClient records WORKER_CALL for every
+call between components. The other metrics are recorded by the component named in their help text,
+see docs/MONITORING.md for who records what.
 """
 
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
@@ -74,6 +75,12 @@ TOOL_CALL_DURATION = Histogram(
     "chatbot_tool_call_seconds",
     "Duration of a tool call, recorded by W8",
     ["tool"],
+    buckets=_SECONDS,
+)
+WORKER_CALL = Histogram(
+    "chatbot_worker_call_seconds",
+    "Time spent in one call to a worker or service, recorded by ContractClient",
+    ["worker", "path"],
     buckets=_SECONDS,
 )
 

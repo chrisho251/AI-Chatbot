@@ -1,4 +1,4 @@
-"""Quality gate, the only way a candidate corpus version reaches serving.
+"""Quality gate, the only way a candidate knowledge base version reaches serving.
 
 A check is a function from GateContext to CheckResult. default_checks returns the structural checks
 built here. The retrieval regression and RAGAs checks belong to the eval lane. Until that lane
@@ -12,9 +12,14 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from chatbot_contracts.base import SCHEMA_VERSION
-from chatbot_contracts.corpus import ChunkSet, CleanPage, CorpusManifest, DocumentVersion
-from chatbot_contracts.enums import CorpusStatus, SourceType
+from chatbot_contracts.enums import KnowledgeBaseStatus, SourceType
 from chatbot_contracts.ids import make_chunk_id
+from chatbot_contracts.knowledge_base import (
+    ChunkSet,
+    CleanPage,
+    DocumentVersion,
+    KnowledgeBaseManifest,
+)
 from chatbot_platform.errors import VersioningError
 from chatbot_platform.models import CheckResult, GateReport, SmeDecision
 from chatbot_platform.registry import Registry
@@ -26,7 +31,7 @@ from chatbot_platform.sql import utcnow
 class GateContext:
     """Everything the checks look at. Pages and chunk sets cover the new document versions only."""
 
-    manifest: CorpusManifest
+    manifest: KnowledgeBaseManifest
     chunk_sets: Sequence[ChunkSet]
     clean_pages: Sequence[CleanPage]
     documents: Mapping[str, DocumentVersion]
@@ -77,7 +82,7 @@ def check_page_coverage(ctx: GateContext) -> CheckResult:
 
 
 def check_ocr_confidence(ctx: GateContext, minimum: float) -> CheckResult:
-    """Pages below the threshold need SME review before the corpus can publish."""
+    """Pages below the threshold need SME review before the knowledge base can publish."""
     problems = [
         f"{page.doc_version} page {page.page_no} ocr confidence {page.flags.min_ocr_conf:.2f}"
         for page in ctx.clean_pages
@@ -152,17 +157,17 @@ def default_checks(settings: PlatformSettings) -> list[Check]:
     ]
 
 
-def sme_required(registry: Registry, manifest: CorpusManifest) -> bool:
+def sme_required(registry: Registry, manifest: KnowledgeBaseManifest) -> bool:
     """New or corrected documents need an SME. A pure embedding refresh does not."""
     if manifest.parent_version is None:
         return True
-    parent = registry.get_corpus_version(manifest.parent_version)
+    parent = registry.get_kb_version(manifest.parent_version)
     return bool(set(manifest.doc_versions) - set(parent.doc_versions))
 
 
 def run_gate(registry: Registry, ctx: GateContext, checks: Sequence[Check]) -> GateReport:
     """Run every check, store the report and link it to the candidate."""
-    if ctx.manifest.status != CorpusStatus.CANDIDATE:
+    if ctx.manifest.status != KnowledgeBaseStatus.CANDIDATE:
         raise VersioningError(f"version {ctx.manifest.version_id} is not a candidate")
     report = GateReport(
         report_id=f"gate-{uuid.uuid4().hex[:12]}",
@@ -172,7 +177,7 @@ def run_gate(registry: Registry, ctx: GateContext, checks: Sequence[Check]) -> G
         created_at=utcnow(),
     )
     registry.add_gate_report(report)
-    registry.set_corpus_status(ctx.manifest.version_id, CorpusStatus.CANDIDATE, report.report_id)
+    registry.set_kb_status(ctx.manifest.version_id, KnowledgeBaseStatus.CANDIDATE, report.report_id)
     return report
 
 

@@ -1,4 +1,5 @@
 # Data sources for the dashboards. The uids are fixed because dashboard JSON refers to them
+# Loki and Tempo answer only while the optional traces profile runs
 apiVersion: 1
 datasources:
   - name: Prometheus
