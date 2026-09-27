@@ -8,12 +8,21 @@ Dagster starts it in the app image with the run id and the document version.
 
 import argparse
 
+from chatbot_platform import ingest
 from chatbot_platform.factory import Platform, build_platform
+from chatbot_platform.storage import split_uri
+from chatbot_w1_ingest import layout
 
 
 def run(platform: Platform, run_id: str, doc_version: str) -> int:
     """Write the regions of one document version and return how many were written."""
-    raise NotImplementedError("W1 ingest job is not written yet")
+    document = platform.registry.get_doc_version(doc_version)
+    bucket, key = split_uri(document.raw_uri)
+    data = platform.store.get(bucket, key)
+    result = layout.analyze(data, doc_version, run_id, store=platform.store)
+    written = ingest.append_records(platform.engine, "ingest.regions", result.regions)
+    platform.registry.set_page_count(doc_version, result.page_count)
+    return written
 
 
 def main(argv: list[str] | None = None) -> None:

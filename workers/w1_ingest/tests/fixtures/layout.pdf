@@ -1,0 +1,92 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Times /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Length 1228 >>
+stream
+BT /Times 22 Tf 72 720 Td (Regression and Random Variables) Tj ET
+BT /Helvetica 13 Tf 72 680 Td (Chapter 3. Least squares estimation) Tj ET
+BT /Helvetica 12 Tf 72 640 Td (The normal equations for a simple linear) Tj ET
+BT /Helvetica 12 Tf 72 624 Td (regression of y on x are written below.) Tj ET
+BT /Times 12 Tf 72 560 Td (y = a + b x + e) Tj ET
+BT /Helvetica 12 Tf 72 470 Td (Coefficient estimates) Tj ET
+0.8 w 72 466 m 372 466 l S
+0.8 w 72 414 m 372 414 l S
+0.8 w 72 440 m 72 414 l S
+0.8 w 372 440 m 372 414 l S
+0.8 w 212 440 m 212 414 l S
+BT /Helvetica 12 Tf 80 422 Td (x) Tj ET
+BT /Helvetica 12 Tf 220 422 Td (y) Tj ET
+BT /Helvetica 12 Tf 80 396 Td (1) Tj ET
+BT /Helvetica 12 Tf 220 396 Td (2.5) Tj ET
+BT /Helvetica 12 Tf 80 370 Td (2) Tj ET
+BT /Helvetica 12 Tf 220 370 Td (4.1) Tj ET
+BT /Helvetica 12 Tf 80 344 Td (3) Tj ET
+BT /Helvetica 12 Tf 220 344 Td (5.8) Tj ET
+BT /Helvetica 12 Tf 72 300 Td (The fitted line and the residuals) Tj ET
+0.8 w 162 120 m 162 260 l S
+0.8 w 252 120 m 252 260 l S
+0.8 w 342 120 m 342 260 l S
+0.8 w 432 120 m 432 260 l S
+0.8 w 522 120 m 522 260 l S
+0.8 w 72 190 m 512 190 l S
+BT /Helvetica 12 Tf 72 200 Td (0) Tj ET
+BT /Helvetica 12 Tf 72 60 Td (Table 3.1 gives the same coefficients.) Tj ET
+
+endstream
+endobj
+5 0 obj
+<< /Length 695 >>
+stream
+BT /Times 22 Tf 72 720 Td (Implementation notes) Tj ET
+BT /Helvetica 12 Tf 72 680 Td (A short listing that fits the dataset follows.) Tj ET
+0.94 g 72 300 460 340 re f
+BT /Courier 11 Tf 88 610 Td (import numpy as np) Tj ET
+BT /Courier 11 Tf 88 588 Td () Tj ET
+BT /Courier 11 Tf 88 566 Td (x = np.array\([1, 2, 3]\)) Tj ET
+BT /Courier 11 Tf 88 544 Td (y = np.array\([2.5, 4.1, 5.8]\)) Tj ET
+BT /Courier 11 Tf 88 522 Td () Tj ET
+BT /Courier 11 Tf 88 500 Td (b, a = np.polyfit\(x, y, 1\)) Tj ET
+BT /Courier 11 Tf 88 478 Td (print\(a, b\)) Tj ET
+BT /Helvetica 12 Tf 72 250 Td (The slope is the estimate of the effect.) Tj ET
+BT /Helvetica 12 Tf 72 200 Td (The intercept is the level at x = 0.) Tj ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 612 792] /Resources << /Font << /Courier 1 0 R /Helvetica 2 0 R /Times 3 0 R >> >> /Contents 4 0 R >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 612 792] /Resources << /Font << /Courier 1 0 R /Helvetica 2 0 R /Times 3 0 R >> >> /Contents 5 0 R >>
+endobj
+8 0 obj
+<< /Type /Pages /Count 2 /Kids [6 0 R 7 0 R] >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000110 00000 n 
+0000000207 00000 n 
+0000000300 00000 n 
+0000001580 00000 n 
+0000002326 00000 n 
+0000002487 00000 n 
+0000002648 00000 n 
+0000002711 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+2760
+%%EOF

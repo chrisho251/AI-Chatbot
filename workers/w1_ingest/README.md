@@ -9,18 +9,26 @@ Worker-ingest from Appendix A.4. Offline only: it turns one registered document 
 
 ## Files
 
-- `job.py`: the entrypoint. Implement `run`.
-- `layout.py`: Docling layout analysis. Implement `analyze`.
+- `job.py`: the entrypoint. Loads the raw file, calls `layout.analyze`, writes the regions and
+  sets the page count. It returns how many regions it wrote.
+- `layout.py`: Docling layout analysis. Maps every Docling item to a `RegionKind`, keeps the box
+  and the raw text of text, table and code regions, and stores the pictures of figure and scan
+  regions in the raw bucket.
+- `tests/fixtures/build_fixture.py`: regenerates the two test PDFs. Run it from the repository
+  root with `uv run --package chatbot-w1-ingest python workers/w1_ingest/tests/fixtures/build_fixture.py`.
 
-## Start here
+## Notes
 
-1. Implement `layout.analyze` against a fixture PDF.
-2. Implement `job.run` with `chatbot_platform.testing.make_test_platform` in your test: upload the fixture with `register_document`, run the job, read `ingest.regions` back with `chatbot_platform.ingest.read_records`.
-
-You never need the other lanes: W2 to W5 only read the rows you write, and the pipeline only calls your CLI.
+OCR belongs to W2 and the code and formula models to W3 and W4, so layout runs the layout, table
+and picture classification models only. A picture is a `scan` when the classifier says it covers a
+whole page and a `figure` otherwise. Every page gets at least one region and a blank page gets one
+empty text region, otherwise the page coverage check of the quality gate fails.
 
 ## Test
 
 ```bash
 uv run --package chatbot-w1-ingest pytest workers/w1_ingest/tests
 ```
+
+The first run downloads the Docling layout, table and picture classification models, so it needs
+network access and a few minutes.
