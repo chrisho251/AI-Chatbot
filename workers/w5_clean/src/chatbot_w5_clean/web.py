@@ -1,4 +1,4 @@
-"""Extract readable text from a fetched web page. Stub owned by Lane B.
+"""Extract readable text from a fetched web page.
 
 Purpose
 W7 fetches pages from allowlisted external sources and sends their HTML here with origin external.
@@ -11,6 +11,20 @@ How to test
 Keep one saved HTML page under tests/fixtures and assert the exercise text survives.
 """
 
+import trafilatura
+
 
 def extract_text(html: str) -> str:
-    raise NotImplementedError("web page extraction is not written yet")
+    """Extract readable text from HTML, dropping navigation and ads."""
+    if not html or not html.strip():
+        return ""
+    extracted = trafilatura.extract(
+        html,
+        output_format="txt",
+        include_comments=False,
+        include_tables=True,
+        include_images=False,
+        favor_precision=True,
+        fast=True,
+    )
+    return extracted or ""
