@@ -1,4 +1,4 @@
-"""Embed the student question at answer time. Stub owned by Lane B.
+"""Embed the student question at answer time.
 
 Purpose
 Appendix A.4 gives query embedding to W6. The vector must come from the same model as the
@@ -19,8 +19,31 @@ How to test
 With make_test_platform, publish a version encoded with another model name and assert the refusal.
 """
 
+from fastapi import HTTPException
+
 from chatbot_contracts.query import EmbedRequest, EmbedResult
+from chatbot_platform.factory import build_platform
+from chatbot_w6_embed.encoder import build_embedder
 
 
 async def embed_query(request: EmbedRequest) -> EmbedResult:
-    raise NotImplementedError("query embedding is not written yet")
+    platform = build_platform()
+    kb_version = platform.registry.get_kb_version(request.kb_version)
+    kb_model = kb_version.embedding_model
+
+    settings = platform.settings
+    loaded_model = settings.llm_model
+
+    if kb_model != loaded_model:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"KB version {request.kb_version} uses embedding model "
+                f"'{kb_model}' but this worker loads '{loaded_model}'"
+            ),
+        )
+
+    embedder = build_embedder(settings)
+    vectors = embedder.embed(request.texts)
+
+    return EmbedResult(vectors=vectors, embedding_model=kb_model)

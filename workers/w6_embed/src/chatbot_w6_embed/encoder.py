@@ -1,4 +1,4 @@
-"""Choose the embedding backend. Stub owned by Lane B.
+"""Choose the embedding backend.
 
 Purpose
 Use TEI over HTTP where it runs, and an in process sentence transformers model on machines where it
@@ -13,19 +13,32 @@ How to test
 LocalEmbedder with a tiny public model returns unit vectors of the right dimension.
 """
 
+import os
 from collections.abc import Sequence
 
-from chatbot_common.embeddings import Embedder
+from sentence_transformers import SentenceTransformer
+
+from chatbot_common.embeddings import Embedder, TeiEmbedder
 from chatbot_common.settings import ServiceSettings
 
 
 class LocalEmbedder:
     def __init__(self, model: str) -> None:
         self.model = model
+        self._model = SentenceTransformer(model)
 
     async def embed(self, texts: Sequence[str]) -> list[list[float]]:
-        raise NotImplementedError("in process embeddings are not written yet")
+        embeddings = self._model.encode(
+            list(texts),
+            normalize_embeddings=True,
+            show_progress_bar=False,
+            convert_to_numpy=True,
+        )
+        return embeddings.tolist()
 
 
 def build_embedder(settings: ServiceSettings) -> Embedder:
-    raise NotImplementedError("embedder selection is not written yet")
+    embed_base_url = os.environ.get("CHATBOT_EMBED_BASE_URL", settings.embed_base_url)
+    if embed_base_url:
+        return TeiEmbedder(base_url=embed_base_url, model=settings.llm_model)
+    return LocalEmbedder(model=settings.llm_model)
